@@ -31,7 +31,8 @@ export default function Panel() {
       <Tool><Sticker /></Tool>
       <Tool><Drag /></Tool>
       <Tool><Select /></Tool>
-      <div className="absolute h-12 w-12 bg-red-300 translate-x-[-50%] bottom-[100%] mb-1 left-[50%]" />
+      <div className="absolute flex border-blue-600 border-solid border-b-[10px] border-r-[10px] rotate-45  h-9 w-9 justify-center items-center translate-x-[-50%] bottom-[100%] mb-1 left-[50%]" >
+      </div>
     </div>
   );
 }
