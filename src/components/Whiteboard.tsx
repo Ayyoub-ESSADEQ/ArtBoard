@@ -12,6 +12,7 @@ export default function Whiteboard() {
   });
   const isDragging = useRef(false);
   const startCoords = useRef({ x: 0, y: 0 });
+  const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
   usePreventBrowserZoom();
   useEffect(() => {
@@ -55,11 +56,22 @@ export default function Whiteboard() {
           x: prevViewBox.x - e.deltaY,
           y: prevViewBox.y,
         }));
+
+        setBackgroundPosition((bgPosition) => ({
+          ...bgPosition,
+          x: bgPosition.x + e.deltaY,
+          y: bgPosition.y,
+        }));
       } else {
         setViewBox((prevViewBox) => ({
           ...prevViewBox,
           x: prevViewBox.x - e.deltaX,
           y: prevViewBox.y - e.deltaY,
+        }));
+        setBackgroundPosition((bgPosition) => ({
+          ...bgPosition,
+          x: bgPosition.x + e.deltaX,
+          y: bgPosition.y + e.deltaY,
         }));
       }
     }
@@ -70,6 +82,12 @@ export default function Whiteboard() {
 
     const deltaX = e.clientX - startCoords.current.x;
     const deltaY = e.clientY - startCoords.current.y;
+
+    setBackgroundPosition((bgPosition) => ({
+      ...bgPosition,
+      x: bgPosition.x + deltaX,
+      y: bgPosition.y + deltaY,
+    }));
 
     setViewBox((prevViewBox) => ({
       ...prevViewBox,
@@ -94,13 +112,31 @@ export default function Whiteboard() {
         onMouseUp={handleMouseUp}
         onWheel={handleWheel}
         className="bg-dotted-grid overflow-hidden"
+        style={{
+          backgroundPosition: `${backgroundPosition.x}px ${backgroundPosition.y}px`,
+        }}
       >
-        <rect fill="blue" x={2000} y={0} width={100} height={200} />
-        <image
-          x={100}
-          y={200}
-          href="https://cdn.dribbble.com/userupload/13167166/file/original-140642a2435ad661883bc040b37c9a76.png?resize=400x300&vertical=center "
-        />
+        {/* <rect fill="blue" x={2000} y={0} width={100} height={200} /> */}
+        <g transform="translate(50, 50)">
+          <g stroke="black">
+            <image
+              x={100}
+              y={200}
+              href="https://cdn.dribbble.com/userupload/13167166/file/original-140642a2435ad661883bc040b37c9a76.png?resize=400x300&vertical=center "
+            />
+          </g>
+
+          <foreignObject className="relative overflow-visible">
+          
+            <div
+              contentEditable="plaintext-only"
+              className="absolute left-0 top- text-nowrap"
+              suppressContentEditableWarning={true}
+            >
+              Editable Text
+            </div>
+          </foreignObject>
+        </g>
       </svg>
       <Panel />
     </>
