@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+  </head>
+  <body>
+    <h1>WebSocket Client</h1>
+
+    <div id="messages"></div>
+
+    <input type="text" id="messageInput" placeholder="Type a message" />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+      const socket = new WebSocket('ws://localhost:8080/user'); // Replace with your WebSocket server URL
+
+      socket.onopen = (event) => {
+        console.log("WebSocket connection opened:", event);
+      };
+
+      socket.onmessage = (event) => {
+        const messagesDiv = document.getElementById("messages");
+        messagesDiv.innerHTML += `<p>${event.data}</p>`;
+      };
+
+      socket.onclose = (event) => {
+        console.log("WebSocket connection closed:", event);
+      };
+
+      function sendMessage() {
+        const messageInput = document.getElementById("messageInput");
+        const message = {
+          user: messageInput.value,
+        };
+
+        socket.send(JSON.stringify(message));
+        messageInput.value = "";
+      }
+    </script>
+  </body>
+</html>

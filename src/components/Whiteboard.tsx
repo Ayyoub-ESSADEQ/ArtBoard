@@ -1,142 +1,110 @@
-import React, { useState, useRef, MouseEvent, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import Panel from "./Panel";
 import { usePreventBrowserZoom } from "../hooks/usePreventBrowserZoom";
+import useStore from "../state/store";
+import Rectangle from "./Shapes/Rectangle";
+import Resizer from "./Resizer";
+import { useFullScreen } from "../hooks/useFullScreen";
+import MouseEventContext, { Whiteboard } from "../utils/MouseEventContext";
 
-export default function Whiteboard() {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [viewBox, setViewBox] = useState({
-    x: 0,
-    y: 0,
-    width: screen.availWidth,
-    height: screen.availHeight,
-  });
-  const isDragging = useRef(false);
-  const startCoords = useRef({ x: 0, y: 0 });
-  const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+export default function SketchBoard() {
+  const whiteboardRef = useRef<SVGSVGElement>(null);
+  const state = useStore((state) => state);
+  const [whiteboard] = useState(new MouseEventContext(new Whiteboard()));
+
+  const {
+    initialDrawing,
+    backgroundPosition,
+    viewBox,
+    setBackgroundPosition,
+    setViewBox,
+  } = state;
 
   usePreventBrowserZoom();
-  useEffect(() => {
-    if (svgRef.current) {
-      svgRef.current.style.width = `${screen.availWidth}px`;
-      svgRef.current.style.height = `${screen.availHeight}px`;
-    }
-  });
-
-  const handleMouseDown = (e: MouseEvent<SVGSVGElement>) => {
-    isDragging.current = true;
-    startCoords.current = { x: e.clientX, y: e.clientY };
-  };
+  useFullScreen(whiteboardRef);
 
   const handleWheel = (e: React.WheelEvent<SVGSVGElement>) => {
-    if (!svgRef.current) return;
+    if (!whiteboardRef.current) return;
 
     if (e.ctrlKey) {
       const point = new DOMPoint();
-
-      const scaleDelta = e.deltaY > 0 ? 1 / 1.1 : 1.1;
+      const scale = e.deltaY > 0 ? 1 / 1.1 : 1.1;
 
       point.x = e.clientX;
       point.y = e.clientY;
 
       const startPoint = point.matrixTransform(
-        svgRef.current.getScreenCTM()?.inverse()
+        whiteboardRef.current.getScreenCTM()?.inverse()
       );
 
-      setViewBox((prevViewBox) => ({
-        ...prevViewBox,
-        x: prevViewBox.x - (startPoint.x - viewBox.x) * (scaleDelta - 1),
-        y: prevViewBox.y - (startPoint.y - viewBox.y) * (scaleDelta - 1),
-        width: prevViewBox.width * scaleDelta,
-        height: prevViewBox.height * scaleDelta,
-      }));
-    } else {
-      if (e.shiftKey) {
-        setViewBox((prevViewBox) => ({
-          ...prevViewBox,
-          x: prevViewBox.x - e.deltaY,
-          y: prevViewBox.y,
-        }));
+      setViewBox({
+        x: viewBox.x - (startPoint.x - viewBox.x) * (scale - 1),
+        y: viewBox.y - (startPoint.y - viewBox.y) * (scale - 1),
+        width: viewBox.width * scale,
+        height: viewBox.height * scale,
+      });
 
-        setBackgroundPosition((bgPosition) => ({
-          ...bgPosition,
-          x: bgPosition.x + e.deltaY,
-          y: bgPosition.y,
-        }));
-      } else {
-        setViewBox((prevViewBox) => ({
-          ...prevViewBox,
-          x: prevViewBox.x - e.deltaX,
-          y: prevViewBox.y - e.deltaY,
-        }));
-        setBackgroundPosition((bgPosition) => ({
-          ...bgPosition,
-          x: bgPosition.x + e.deltaX,
-          y: bgPosition.y + e.deltaY,
-        }));
-      }
+      return;
     }
-  };
 
-  const handleMouseMove = (e: MouseEvent<SVGSVGElement>) => {
-    if (!isDragging.current) return;
+    if (e.shiftKey) {
+      setViewBox({
+        width: viewBox.width,
+        height: viewBox.height,
+        x: viewBox.x - e.deltaY,
+        y: viewBox.y,
+      });
 
-    const deltaX = e.clientX - startCoords.current.x;
-    const deltaY = e.clientY - startCoords.current.y;
+      setBackgroundPosition({
+        x: backgroundPosition.x + e.deltaY,
+        y: backgroundPosition.y,
+      });
 
-    setBackgroundPosition((bgPosition) => ({
-      ...bgPosition,
-      x: bgPosition.x + deltaX,
-      y: bgPosition.y + deltaY,
-    }));
+      return;
+    }
 
-    setViewBox((prevViewBox) => ({
-      ...prevViewBox,
-      x: prevViewBox.x - deltaX,
-      y: prevViewBox.y - deltaY,
-    }));
+    setViewBox({
+      width: viewBox.width,
+      height: viewBox.height,
+      x: viewBox.x - e.deltaX,
+      y: viewBox.y - e.deltaY,
+    });
 
-    startCoords.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const handleMouseUp = () => {
-    isDragging.current = false;
+    setBackgroundPosition({
+      x: backgroundPosition.x + e.deltaX,
+      y: backgroundPosition.y + e.deltaY,
+    });
   };
 
   return (
     <>
       <svg
-        ref={svgRef}
+        ref={whiteboardRef}
         viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
+        onMouseDown={whiteboard.handleMouseDown}
+        onMouseMove={whiteboard.handleMouseMove}
+        onMouseUp={whiteboard.handleMouseUp}
         onWheel={handleWheel}
+        onContextMenu={(e) => e.preventDefault()}
         className="bg-dotted-grid overflow-hidden"
+        data-type="whiteboard"
         style={{
           backgroundPosition: `${backgroundPosition.x}px ${backgroundPosition.y}px`,
         }}
       >
-        {/* <rect fill="blue" x={2000} y={0} width={100} height={200} /> */}
-        <g transform="translate(50, 50)">
-          <g stroke="black">
-            <image
-              x={100}
-              y={200}
-              href="https://cdn.dribbble.com/userupload/13167166/file/original-140642a2435ad661883bc040b37c9a76.png?resize=400x300&vertical=center "
+        {initialDrawing.map(({ id, width, height, fill, x, y }) => (
+          <Resizer key={id}>
+            <Rectangle
+              width={width}
+              height={height}
+              x={x}
+              y={y}
+              fill={fill}
+              key={id}
+              id={id}
             />
-          </g>
-
-          <foreignObject className="relative overflow-visible">
-          
-            <div
-              contentEditable="plaintext-only"
-              className="absolute left-0 top- text-nowrap"
-              suppressContentEditableWarning={true}
-            >
-              Editable Text
-            </div>
-          </foreignObject>
-        </g>
+          </Resizer>
+        ))}
       </svg>
       <Panel />
     </>

@@ -29,4 +29,8 @@ html,
     background-size: 1rem 1rem;
     background-position: center center;
   }
+
+  .figma-cursor{
+    cursor: url('./assets/cursor.png'), auto;
+  }
 }

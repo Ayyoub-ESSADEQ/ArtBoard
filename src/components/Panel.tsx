@@ -13,9 +13,7 @@ interface ToolProps {
 
 const Tool = (props: ToolProps) => {
   return (
-    <div
-      className="h-12 w-12 select-none hover:bg-gray-400 cursor-pointer bg-orange-300 rounded-md flex justify-center items-center"
-    >
+    <div className="h-12 w-12 select-none hover:bg-gray-400 cursor-pointer bg-white rounded-md flex justify-center items-center">
       {props?.children}
     </div>
   );
@@ -24,15 +22,27 @@ const Tool = (props: ToolProps) => {
 export default function Panel() {
   return (
     <div className="bg-white rounded-md shadow-md border-solid border-2 border-gray-200 p-1 box-border flex flex-row gap-1 fixed bottom-2 left-[50%] translate-x-[-50%]">
-      <Tool><Rectangle /></Tool>
-      <Tool><Circle /></Tool>
-      <Tool><Image /></Tool>
-      <Tool><Text /></Tool>
-      <Tool><Sticker /></Tool>
-      <Tool><Drag /></Tool>
-      <Tool><Select /></Tool>
-      <div className="absolute flex border-blue-600 border-solid border-b-[10px] border-r-[10px] rotate-45  h-9 w-9 justify-center items-center translate-x-[-50%] bottom-[100%] mb-1 left-[50%]" >
-      </div>
+      <Tool>
+        <Rectangle />
+      </Tool>
+      <Tool>
+        <Circle />
+      </Tool>
+      <Tool>
+        <Image />
+      </Tool>
+      <Tool>
+        <Text />
+      </Tool>
+      <Tool>
+        <Sticker />
+      </Tool>
+      <Tool>
+        <Drag />
+      </Tool>
+      <Tool>
+        <Select />
+      </Tool>
     </div>
   );
 }
