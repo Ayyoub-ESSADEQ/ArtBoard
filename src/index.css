@@ -12,7 +12,7 @@ html,
 }
 
 @layer {
-  .grid-lined-grid {
+  .bg-lined-grid {
     height: 16rem;
     background-image: linear-gradient(
         to right,
@@ -20,7 +20,7 @@ html,
         transparent 1px
       ),
       linear-gradient(to bottom, rgb(203 213 225) 1px, transparent 1px);
-    background-size: 2.5rem 2.5rem;
+    background-size: 2.9rem 2.9rem;
     background-position: center center;
   }
 
