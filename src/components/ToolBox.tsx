@@ -5,6 +5,7 @@ import { Text } from "./icons/Text";
 import { Sticker } from "./icons/Sticker";
 import { Drag } from "./icons/Drag";
 import { Select } from "./icons/Select";
+import { Arrow } from "./icons/Arrow";
 
 interface ToolProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,7 +20,7 @@ const Tool = (props: ToolProps) => {
   );
 };
 
-export default function Panel() {
+export default function ToolBox() {
   return (
     <div className="bg-white rounded-md shadow-md border-solid border-2 border-gray-200 p-1 box-border flex flex-row gap-1 fixed bottom-2 left-[50%] translate-x-[-50%]">
       <Tool>
@@ -39,6 +40,9 @@ export default function Panel() {
       </Tool>
       <Tool>
         <Drag />
+      </Tool>
+      <Tool>
+        <Arrow />
       </Tool>
       <Tool>
         <Select />

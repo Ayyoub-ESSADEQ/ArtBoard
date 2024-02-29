@@ -5,12 +5,14 @@ interface ImageProps extends React.SVGProps<SVGImageElement> {
 }
 
 export default function Image(props: ImageProps) {
-  const {setElementProps} = useStore();
+  const { setElementProps } = useStore();
 
   const handleImageLoad = (e: React.SyntheticEvent<SVGImageElement, Event>) => {
     const { width, height } = e.currentTarget.getBBox();
     setElementProps(props.id, { width: width, height: height });
   };
 
-  return <image {...props} onLoad={handleImageLoad} />;
+  return (
+    <image {...props} onLoad={handleImageLoad} preserveAspectRatio="true" />
+  );
 }

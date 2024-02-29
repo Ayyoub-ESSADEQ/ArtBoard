@@ -60,6 +60,24 @@ const INITIAL_DRAWING = [
     height: 300,
     fill: "red",
   },
+  {
+    id: nanoid(6),
+    type: "circle",
+    x: 900,
+    y: 400,
+    width: 200,
+    height: 300,
+    fill: "yellow",
+  },
+  {
+    id: nanoid(6),
+    type: "text",
+    x: 900,
+    y: 400,
+    width: 200,
+    height: 300,
+    fill: "yellow",
+  },
 ];
 
 const useStore = create<BearState>()((set, get) => ({

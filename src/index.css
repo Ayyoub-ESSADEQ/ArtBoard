@@ -33,4 +33,9 @@ html,
   .figma-cursor{
     cursor: url('./assets/cursor.png'), auto;
   }
+
+  .avatar {
+    background-image: url('https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?w=740&t=st=1709228492~exp=1709229092~hmac=d9dc992f5ea757e439799d734a79415ba0fb3d0db3966081d1ae0ba7db9157d6');
+    background-size: cover; /* Adjust as needed */
+  }
 }

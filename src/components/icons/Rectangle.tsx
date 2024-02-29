@@ -1,6 +1,6 @@
-import { SVGProps } from "react";
+import { SVGProps, memo } from "react";
 
-export function Rectangle(props: Readonly<SVGProps<SVGSVGElement>>) {
+export const Rectangle = memo((props: Readonly<SVGProps<SVGSVGElement>>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -15,4 +15,4 @@ export function Rectangle(props: Readonly<SVGProps<SVGSVGElement>>) {
       ></path>
     </svg>
   );
-}
+});

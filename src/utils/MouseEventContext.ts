@@ -2,6 +2,17 @@
 import useStore from "../state/store";
 import { MouseEvent, WheelEvent } from "react";
 
+const HANDLER = "handler";
+const WHITEBOARD = "whiteboard";
+const SHAPE = "shape";
+
+interface Coords {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 /// Here is the state intereface that each concrete implementation should implement
 abstract class State {
   public abstract handleMouseDown(e: MouseEvent<any>): void;
@@ -175,23 +186,24 @@ export class Whiteboard extends State {
 
   public handleMouseDown(e: MouseEvent<any>) {
     const target = e.target as HTMLElement;
-    
-    const { setDragging, setStartCoords, setFocusedComponentId } = useStore.getState();
+
+    const { setDragging, setStartCoords, setFocusedComponentId } =
+      useStore.getState();
     setFocusedComponentId(target.id);
 
     switch (target.dataset.type) {
-      case "handler":
+      case HANDLER:
         this.context.changeState(new Handler());
         this.context.getState().handleMouseDown(e);
         return;
 
-      case "whiteboard":
+      case WHITEBOARD:
         this.context.changeState(this);
         setDragging(true);
         setStartCoords({ x: e.clientX, y: e.clientY });
         return;
 
-      case "shape":
+      case SHAPE:
         this.context.changeState(new Shape());
         this.context.getState().handleMouseDown(e);
         return;
@@ -205,33 +217,117 @@ export class Whiteboard extends State {
 }
 
 export class Handler extends State {
-  handleMouseWheel() {}
+  private x!: number;
+  private y!: number;
+  private id!: string;
+  private width!: number;
+  private height!: number;
+  private orientation!: string;
 
-  handleMouseDown(e: MouseEvent<any>) {
+  public handleMouseWheel() {}
+
+  public handleMouseDown(e: MouseEvent<any>) {
     const target = e.target as HTMLElement;
+    const { setFocusedComponentId, setDragging } = useStore.getState();
+    this.id = target.id;
+    setFocusedComponentId(this.id);
 
-    if (target.dataset.type === "whiteboard") {
-      this.context.changeState(new Whiteboard());
-      this.context.getState().handleMouseDown(e);
-      console.log("Go back to whiteboard");
-      return;
+    switch (target.dataset.type) {
+      case WHITEBOARD:
+        this.context.changeState(new Whiteboard());
+        this.context.getState().handleMouseDown(e);
+        return;
+
+      case SHAPE:
+        this.context.changeState(new Shape());
+        this.context.getState().handleMouseDown(e);
+        return;
     }
 
-    console.log("Go to ResizableFrame");
+    const { getElementProps } = useStore.getState();
+    const { x, y, width, height } = getElementProps(this.id)!;
+
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.orientation = target.dataset.orientation!;
+    setDragging(true);
   }
 
-  handleMouseUp() {
-    // console.log(e);
+  public handleMouseUp() {
+    const { setDragging } = useStore.getState();
+    setDragging(false);
+    this.context.changeState(new Whiteboard());
   }
 
-  public handleMouseMove(): void {
-    // const state = useStore.getState();
-    // const { startCoords, isDragging, setStartCoords, setElementProps, getElementProps } = state;
-    // if (!isDragging) return;
-    // const deltaX = e.clientX - startCoords.x;
-    // const deltaY = e.clientY - startCoords.y;
-    // setElementProps('', {})
-    // setStartCoords({ x: e.clientX, y: e.clientY });
+  public handleMouseMove(e: MouseEvent<any>): void {
+    const { isDragging, setElementProps } = useStore.getState();
+    if (!isDragging) return;
+
+    const svg = Whiteboard.whiteboardReference?.current;
+    const point = new DOMPoint();
+
+    point.x = e.clientX;
+    point.y = e.clientY;
+
+    const cursor = point.matrixTransform(svg?.getScreenCTM()?.inverse());
+    const deltaX = cursor.x - this.x;
+    const deltaY = cursor.y - this.y;
+
+    const orientationProps: Record<string, () => Coords> = {
+      "top-left": () => ({
+        x: cursor.x,
+        y: cursor.y,
+        width: this.width - deltaX,
+        height: this.height - deltaY,
+      }),
+      "top-right": () => ({
+        x: this.x,
+        y: this.y + deltaY,
+        width: deltaX,
+        height: this.height - deltaY,
+      }),
+      "bottom-left": () => ({
+        x: this.x + deltaX,
+        y: this.y,
+        width: this.width - deltaX,
+        height: deltaY,
+      }),
+      "bottom-right": () => ({
+        x: this.x,
+        y: this.y,
+        width: deltaX,
+        height: deltaY,
+      }),
+      "top-middle": () => ({
+        x: this.x,
+        y: cursor.y,
+        width: this.width,
+        height: this.height - deltaY,
+      }),
+      "bottom-middle": () => ({
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: deltaY,
+      }),
+      "middle-left": () => ({
+        x: cursor.x,
+        y: this.y,
+        width: this.width - deltaX,
+        height: this.height,
+      }),
+      "middle-right": () => ({
+        x: this.x,
+        y: this.y,
+        width: deltaX,
+        height: this.height,
+      }),
+    };
+
+    const props = orientationProps[this.orientation]();
+    setElementProps(this.id, props);
   }
 }
 
@@ -240,8 +336,8 @@ export class Shape extends State {
   private deltaX = 0;
   private deltaY = 0;
 
-  handleMouseWheel() {}
-  handleMouseDown(e: MouseEvent<any>) {
+  public handleMouseWheel() {}
+  public handleMouseDown(e: MouseEvent<any>) {
     const target = e.target as HTMLElement;
     const {
       setDragging,
@@ -250,11 +346,17 @@ export class Shape extends State {
       setFocusedComponentId,
     } = useStore.getState();
 
-    if (target.dataset.type === "whiteboard") {
-      this.context.changeState(new Whiteboard());
-      this.context.getState().handleMouseDown(e);
-      console.log("Go back to whiteboard");
-      return;
+    switch (target.dataset.type) {
+      case HANDLER:
+        this.context.changeState(new Handler());
+        this.context.getState().handleMouseDown(e);
+        return;
+
+      case WHITEBOARD:
+        this.context.changeState(this);
+        this.context.changeState(new Handler());
+        this.context.getState().handleMouseDown(e);
+        return;
     }
 
     this.id = target.id;
@@ -264,7 +366,7 @@ export class Shape extends State {
 
     setDragging(true);
     setStartCoords({ x: e.clientX, y: e.clientY });
-    const svg = document.getElementById("whiteboard")! as any;
+    const svg = document.getElementById(WHITEBOARD)! as any;
     const point = new DOMPoint();
 
     point.x = e.clientX;
@@ -276,16 +378,17 @@ export class Shape extends State {
     this.deltaY = startPoint.y - y;
   }
 
-  handleMouseUp() {
+  public handleMouseUp() {
     const { setDragging } = useStore.getState();
     setDragging(false);
+    this.context.changeState(new Whiteboard());
   }
 
   public handleMouseMove(e: MouseEvent<any>): void {
     const { isDragging, setElementProps } = useStore.getState();
     if (!isDragging) return;
 
-    const svg = document.getElementById("whiteboard")! as any;
+    const svg = document.getElementById(WHITEBOARD)! as any;
     const point = new DOMPoint();
 
     point.x = e.clientX;

@@ -2,9 +2,11 @@ import {
   ReactComponentElement,
   SVGProps,
   createContext,
+  memo,
   useContext,
 } from "react";
 import useStore from "../state/store";
+import Rectangle from "./Shapes/Rectangle";
 
 type Element = "div" | "svg" | "rect" | "circle";
 type Orientation =
@@ -34,7 +36,7 @@ interface ResizableFrameProps {
 
 const idContext = createContext("");
 
-const ResizeHandler = (props: ResizeHandlerProps) => {
+const ResizeHandler = memo((props: ResizeHandlerProps) => {
   const corner = 8;
   const id = useContext(idContext);
   const { scale } = useStore();
@@ -56,15 +58,66 @@ const ResizeHandler = (props: ResizeHandlerProps) => {
       id={`${id}`}
     />
   );
-};
+});
 
-const ResizableFrame = ({ width, height, x, y }: ResizableFrameProps) => {
+const ResizeHandlers = memo(
+  ({ width, height }: { width: number; height: number }) => (
+    <>
+      <ResizeHandler
+        className="hover:cursor-nw-resize"
+        orientation="top-left"
+      />
+      <ResizeHandler
+        x={width / 2}
+        className="hover:cursor-n-resize"
+        orientation="top-middle"
+      />
+      <ResizeHandler
+        x={width}
+        className="hover:cursor-ne-resize"
+        orientation="top-right"
+      />
+      <ResizeHandler
+        y={height}
+        className="hover:cursor-sw-resize"
+        orientation="bottom-left"
+      />
+      <ResizeHandler
+        y={height / 2}
+        className="hover:cursor-e-resize"
+        orientation="middle-left"
+      />
+      <ResizeHandler
+        x={width}
+        y={height / 2}
+        className="hover:cursor-e-resize"
+        orientation="middle-right"
+      />
+      <ResizeHandler
+        x={width / 2}
+        y={height}
+        className="hover:cursor-n-resize"
+        orientation="bottom-middle"
+      />
+      <ResizeHandler
+        x={width}
+        y={height}
+        className="hover:cursor-se-resize"
+        orientation="bottom-right"
+      />
+    </>
+  )
+);
+
+const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
   const { scale, focusedComponentId } = useStore();
   const id = useContext(idContext);
 
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <rect
+      <Rectangle
+        x={0}
+        y={0}
         width={width}
         height={height}
         fill="transparent"
@@ -74,58 +127,15 @@ const ResizableFrame = ({ width, height, x, y }: ResizableFrameProps) => {
         id={`${id}`}
       />
       {focusedComponentId === id ? (
-        <>
-          <ResizeHandler
-            className="hover:cursor-nw-resize"
-            orientation="top-left"
-          />
-          <ResizeHandler
-            x={width / 2}
-            className="hover:cursor-n-resize"
-            orientation="top-middle"
-          />
-          <ResizeHandler
-            x={width}
-            className="hover:cursor-ne-resize"
-            orientation="top-right"
-          />
-          <ResizeHandler
-            y={height}
-            className="hover:cursor-sw-resize"
-            orientation="bottom-left"
-          />
-          <ResizeHandler
-            y={height / 2}
-            className="hover:cursor-e-resize"
-            orientation="middle-left"
-          />
-          <ResizeHandler
-            x={width}
-            y={height / 2}
-            className="hover:cursor-e-resize"
-            orientation="middle-right"
-          />
-          <ResizeHandler
-            x={width / 2}
-            y={height}
-            className="hover:cursor-n-resize"
-            orientation="bottom-middle"
-          />
-          <ResizeHandler
-            x={width}
-            y={height}
-            className="hover:cursor-se-resize"
-            orientation="bottom-right"
-          />
-        </>
+        <ResizeHandlers width={width} height={height} />
       ) : (
         <></>
       )}
     </g>
   );
-};
+});
 
-export default function Resizer(props: Readonly<ResizerProps>) {
+const Resizer = memo((props: Readonly<ResizerProps>) => {
   const { getElementProps } = useStore((state) => state);
   const { width, height, x, y } = getElementProps(props.children.key!)!;
   return (
@@ -136,4 +146,6 @@ export default function Resizer(props: Readonly<ResizerProps>) {
       </idContext.Provider>
     </>
   );
-}
+});
+
+export default Resizer;
