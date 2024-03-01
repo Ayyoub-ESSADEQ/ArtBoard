@@ -31,7 +31,7 @@ export default function SketchBoard() {
         onMouseUp={whiteboard.current.handleMouseUp}
         onWheel={whiteboard.current.handleMouseWheel}
         onContextMenu={(e) => e.preventDefault()}
-        className="absolute top-0 left-0 bg-dotted-grid overflow-hidden"
+        className="absolute top-0 left-0 bg-lined-grid overflow-hidden"
         data-type="whiteboard"
         style={{
           backgroundPosition: `${backgroundPosition.x}px ${backgroundPosition.y}px`,

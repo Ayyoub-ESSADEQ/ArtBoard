@@ -19,6 +19,7 @@ export interface BearState {
   initialDrawing: Shape[];
   backgroundPosition: Coords;
   isDragging: boolean;
+  isCommentSectionToggeled: boolean;
   startCoords: Coords;
   viewBox: ViewBox;
   scale: number;
@@ -26,6 +27,7 @@ export interface BearState {
   setViewBox: (viewbox: ViewBox) => void;
   setStartCoords: (startCoords: Coords) => void;
   setDragging: (draggingState: boolean) => void;
+  setCommentSectionToToggled: (isToggled: boolean) => void;
   setBackgroundPosition: (backgroundPosition: Coords) => void;
   setFocusedComponentId: (id: string) => void;
   getElementProps: (id: string) => Shape | undefined;
@@ -81,6 +83,7 @@ const INITIAL_DRAWING = [
 ];
 
 const useStore = create<BearState>()((set, get) => ({
+  isCommentSectionToggeled: false,
   focusedComponentId: "",
   backgroundPosition: { x: 0, y: 0 },
   scale: 1,
@@ -135,6 +138,10 @@ const useStore = create<BearState>()((set, get) => ({
 
   setFocusedComponentId(id) {
     set((state) => ({ ...state, focusedComponentId: id }));
+  },
+
+  setCommentSectionToToggled(isToggled) {
+    set((state) => ({ ...state, isCommentSectionToggeled: isToggled }));
   },
 }));
 

@@ -12,7 +12,5 @@ export default function Image(props: ImageProps) {
     setElementProps(props.id, { width: width, height: height });
   };
 
-  return (
-    <image {...props} onLoad={handleImageLoad} preserveAspectRatio="true" />
-  );
+  return <image {...props} onLoad={handleImageLoad} />;
 }
