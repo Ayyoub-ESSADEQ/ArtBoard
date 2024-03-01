@@ -1,8 +1,6 @@
-import { SVGProps } from "react";
+import { SVGProps, memo } from "react";
 
-export function Circle(
-  props: Readonly<SVGProps<SVGSVGElement>>
-) {
+export const Circle = memo((props: Readonly<SVGProps<SVGSVGElement>>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -17,4 +15,4 @@ export function Circle(
       ></path>
     </svg>
   );
-}
+});

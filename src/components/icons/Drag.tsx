@@ -1,4 +1,6 @@
-export function Drag(props: Readonly<SVGProps<SVGSVGElement>>) {
+import { SVGProps, memo } from "react";
+
+export const Drag = memo((props: Readonly<SVGProps<SVGSVGElement>>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -13,4 +15,4 @@ export function Drag(props: Readonly<SVGProps<SVGSVGElement>>) {
       ></path>
     </svg>
   );
-}
+});

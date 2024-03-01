@@ -1,6 +1,6 @@
-import { SVGProps } from "React";
+import { SVGProps, memo } from "react";
 
-export function Text(props: Readonly<SVGProps<SVGSVGElement>>) {
+export const Text = memo((props: Readonly<SVGProps<SVGSVGElement>>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -15,4 +15,4 @@ export function Text(props: Readonly<SVGProps<SVGSVGElement>>) {
       ></path>
     </svg>
   );
-}
+});

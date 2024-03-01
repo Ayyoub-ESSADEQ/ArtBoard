@@ -1,6 +1,5 @@
 /*In the main file where you put all the css*/
 @tailwind base;
-@tailwind components;
 @tailwind utilities;
 
 body,
@@ -8,10 +7,11 @@ html,
 #root {
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 @layer {
-  .grid-lined-grid {
+  .bg-lined-grid {
     height: 16rem;
     background-image: linear-gradient(
         to right,
@@ -19,7 +19,7 @@ html,
         transparent 1px
       ),
       linear-gradient(to bottom, rgb(203 213 225) 1px, transparent 1px);
-    background-size: 2.5rem 2.5rem;
+    background-size: 2.9rem 2.9rem;
     background-position: center center;
   }
 
@@ -27,5 +27,64 @@ html,
     background-image: radial-gradient(circle, rgb(203 213 225) 1px, #fff 1px);
     background-size: 1rem 1rem;
     background-position: center center;
+  }
+
+  .figma-cursor {
+    cursor: url("./assets/cursor.png"), auto;
+  }
+
+  .avatar {
+    background-image: url("https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?w=740&t=st=1709228492~exp=1709229092~hmac=d9dc992f5ea757e439799d734a79415ba0fb3d0db3966081d1ae0ba7db9157d6");
+    background-size: cover; /* Adjust as needed */
+  }
+
+  .placeholder {
+    width: 500px;
+    height: 70px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 5px;
+  }
+
+  .placeholder[data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #555;
+  }
+
+  /* Firefox (uncomment to work in Firefox, although other properties will not work!)  */
+  /** {
+  scrollbar-width: thin;
+  scrollbar-color: #397524 #DFE9EB;
+}*/
+
+  /* Chrome, Edge and Safari */
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track:hover {
+    background-color: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track:active {
+    background-color: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: #868686;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #b0b0b0;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background-color: #868686;
   }
 }
