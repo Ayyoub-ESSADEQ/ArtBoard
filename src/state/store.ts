@@ -46,6 +46,15 @@ const INITIAL_DRAWING = [
   },
   {
     id: nanoid(6),
+    type: "hexagonal",
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 200,
+    fill: "blue",
+  },
+  {
+    id: nanoid(6),
     type: "rect",
     x: 200,
     y: 400,
