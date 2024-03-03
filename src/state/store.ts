@@ -1,6 +1,17 @@
 import { nanoid } from "nanoid";
 import { create } from "zustand";
 
+export const Tool = {
+  Rectangle: "cross-hair",
+  Circle: "cross-hair",
+  Arrow: "cross-hair",
+  Text: "text",
+  Pan: "grab",
+  Select: "arrow",
+  Sticker: "arrow",
+  Image: "arrow",
+};
+
 interface Shape {
   height: number;
   width: number;
@@ -15,6 +26,7 @@ type ViewBox = { x: number; y: number; width: number; height: number };
 type Coords = { x: number; y: number };
 
 export interface BearState {
+  toolInUseName: keyof typeof Tool;
   focusedComponentId: string;
   initialDrawing: Shape[];
   backgroundPosition: Coords;
@@ -22,6 +34,7 @@ export interface BearState {
   isCommentSectionToggeled: boolean;
   startCoords: Coords;
   viewBox: ViewBox;
+  whiteboardCursor: string;
   scale: number;
   setScale: (factor: number) => void;
   setViewBox: (viewbox: ViewBox) => void;
@@ -32,6 +45,8 @@ export interface BearState {
   setFocusedComponentId: (id: string) => void;
   getElementProps: (id: string) => Shape | undefined;
   setElementProps: (id: string, props: object) => void;
+  setWhiteboardCursor: (cursor: string) => void;
+  setToolInUseName: (toolName: keyof typeof Tool) => void;
 }
 
 const INITIAL_DRAWING = [
@@ -40,8 +55,8 @@ const INITIAL_DRAWING = [
     type: "rect",
     x: 100,
     y: 100,
-    width: 200,
-    height: 100,
+    width: 1,
+    height: 1,
     fill: "blue",
   },
   {
@@ -92,6 +107,8 @@ const INITIAL_DRAWING = [
 ];
 
 const useStore = create<BearState>()((set, get) => ({
+  whiteboardCursor: "arrow",
+  toolInUseName: "Select",
   isCommentSectionToggeled: false,
   focusedComponentId: "",
   backgroundPosition: { x: 0, y: 0 },
@@ -151,6 +168,14 @@ const useStore = create<BearState>()((set, get) => ({
 
   setCommentSectionToToggled(isToggled) {
     set((state) => ({ ...state, isCommentSectionToggeled: isToggled }));
+  },
+
+  setWhiteboardCursor(cursor) {
+    set((state) => ({ ...state, whiteboardCursor: cursor }));
+  },
+
+  setToolInUseName(toolName) {
+    set((state) => ({ ...state, toolInUseName: toolName }));
   },
 }));
 

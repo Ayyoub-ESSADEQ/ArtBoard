@@ -75,9 +75,9 @@ export class Whiteboard extends State {
     const {
       backgroundPosition,
       viewBox,
+      scale,
       setBackgroundPosition,
       setViewBox,
-      scale,
       setScale,
     } = useStore.getState();
 
@@ -163,9 +163,11 @@ export class Whiteboard extends State {
       setViewBox,
       setBackgroundPosition,
       setStartCoords,
+      setWhiteboardCursor,
     } = useStore.getState();
 
     if (!isDragging) return;
+
     const deltaX = e.clientX - startCoords.x;
     const deltaY = e.clientY - startCoords.y;
 
@@ -173,6 +175,8 @@ export class Whiteboard extends State {
       x: backgroundPosition.x + deltaX,
       y: backgroundPosition.y + deltaY,
     });
+
+    setWhiteboardCursor("grabbing");
 
     setViewBox({
       width: viewBox.width,
@@ -187,8 +191,21 @@ export class Whiteboard extends State {
   public handleMouseDown(e: MouseEvent<any>) {
     const target = e.target as HTMLElement;
 
-    const { setDragging, setStartCoords, setFocusedComponentId } =
-      useStore.getState();
+    const {
+      setDragging,
+      setStartCoords,
+      setFocusedComponentId,
+      toolInUseName,
+    } = useStore.getState();
+
+    if (toolInUseName === "Pan") {
+      setFocusedComponentId("whiteboard");
+      this.context.changeState(this);
+      setDragging(true);
+      setStartCoords({ x: e.clientX, y: e.clientY });
+      return;
+    }
+
     setFocusedComponentId(target.id);
 
     switch (target.dataset.type) {
@@ -211,7 +228,8 @@ export class Whiteboard extends State {
   }
 
   public handleMouseUp() {
-    const { setDragging } = useStore.getState();
+    const { setDragging, setWhiteboardCursor } = useStore.getState();
+    setWhiteboardCursor("grab");
     setDragging(false);
   }
 }

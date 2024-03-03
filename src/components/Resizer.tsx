@@ -6,7 +6,7 @@ import {
   useContext,
 } from "react";
 import useStore from "../state/store";
-import Rectangle from "./Shapes/Rectangle";
+import { Rectangle } from "./Shapes/Rectangle";
 
 type Element = "div" | "svg" | "rect" | "circle";
 type Orientation =
@@ -122,7 +122,7 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
         height={height}
         fill="transparent"
         strokeWidth={focusedComponentId === id ? 2 * scale : 0}
-        className="stroke-blue-500"
+        className="stroke-blue-500  hover:cursor-move"
         data-type="shape"
         id={`${id}`}
       />

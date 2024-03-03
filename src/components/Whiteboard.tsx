@@ -1,26 +1,38 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { usePreventBrowserZoom } from "../hooks/usePreventBrowserZoom";
+import { useFullScreen } from "../hooks/useFullScreen";
+import { Rectangle } from "./Shapes/Rectangle";
+import { Image } from "./Shapes/Image";
+import { Text } from "./Shapes/Text";
+import { Circle } from "./Shapes/Circle";
+import { Hexagonal } from "./Shapes/Hexagonal";
+
 import useStore from "../state/store";
 import Resizer from "./Resizer";
-import { useFullScreen } from "../hooks/useFullScreen";
 import MouseEventContext, { Whiteboard } from "../utils/MouseEventContext";
-import Rectangle from "./Shapes/Rectangle";
-import Image from "./Shapes/Image";
-import Text from "./Shapes/Text";
-import Circle from "./Shapes/Circle";
-import Hexagonal from "./Shapes/Hexagonal";
 
-export default function SketchBoard() {
+const SketchBoard = memo(() => {
   const whiteboardRef = useRef<SVGSVGElement>(null);
   const whiteboard = useRef(new MouseEventContext(new Whiteboard()));
-
-  const { initialDrawing, backgroundPosition, viewBox, scale } = useStore();
+  const {
+    initialDrawing,
+    backgroundPosition,
+    viewBox,
+    scale,
+    whiteboardCursor,
+  } = useStore();
 
   useFullScreen(whiteboardRef);
   usePreventBrowserZoom();
   useEffect(() => {
     Whiteboard.whiteboardReference = whiteboardRef;
   });
+
+  useEffect(() => {
+    if (!whiteboardRef.current) return;
+    const whiteboard = whiteboardRef.current;
+    whiteboard.style.cursor = `${whiteboardCursor}`;
+  }, [whiteboardCursor]);
 
   return (
     <svg
@@ -120,4 +132,5 @@ export default function SketchBoard() {
       })}
     </svg>
   );
-}
+});
+export default SketchBoard;

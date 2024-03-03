@@ -6,47 +6,69 @@ import { Sticker } from "./icons/Sticker";
 import { Drag } from "./icons/Drag";
 import { Select } from "./icons/Select";
 import { Arrow } from "./icons/Arrow";
+import useStore, { Tool } from "../state/store";
+import { memo } from "react";
 
 interface ToolProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children?: React.ReactComponentElement<any> | string;
+  functionality: keyof typeof Tool;
 }
 
-const Tool = (props: ToolProps) => {
+const ToolItem = (props: ToolProps) => {
+  const { toolInUseName } = useStore();
+  const { setToolInUseName, setWhiteboardCursor } = useStore();
+
+  const active =
+    toolInUseName === props.functionality ? "bg-violet-300" : "bg-white";
+
+  const setToolAndCursor = () => {
+    setToolInUseName(props.functionality);
+    setWhiteboardCursor(Tool[props.functionality]);
+    console.log(Tool[props.functionality]);
+  };
+
   return (
-    <div className="h-12 w-12 select-none hover:bg-gray-400 cursor-pointer bg-white rounded-md flex justify-center items-center">
+    <div
+      onClick={setToolAndCursor}
+      className={`h-12 w-12 select-none ${
+        active === "bg-white" ? "hover:bg-gray-100" : ""
+      } cursor-pointer ${active} rounded-md flex justify-center items-center`}
+    >
       {props?.children}
     </div>
   );
 };
 
-export default function ToolBox() {
+const ToolBox = memo(() => {
   return (
     <div className="bg-white rounded-md shadow-md border-solid border-2 border-gray-200 p-1 box-border flex flex-row gap-1 fixed bottom-2 left-[50%] translate-x-[-50%]">
-      <Tool>
+      <ToolItem functionality={"Rectangle"}>
         <Rectangle />
-      </Tool>
-      <Tool>
+      </ToolItem>
+      <ToolItem functionality={"Circle"}>
         <Circle />
-      </Tool>
-      <Tool>
+      </ToolItem>
+      <ToolItem functionality={"Image"}>
         <Image />
-      </Tool>
-      <Tool>
+      </ToolItem>
+      <ToolItem functionality={"Text"}>
         <Text />
-      </Tool>
-      <Tool>
+      </ToolItem>
+      <ToolItem functionality={"Sticker"}>
         <Sticker />
-      </Tool>
-      <Tool>
+      </ToolItem>
+      <ToolItem functionality={"Pan"}>
         <Drag />
-      </Tool>
-      <Tool>
+      </ToolItem>
+      <ToolItem functionality={"Arrow"}>
         <Arrow />
-      </Tool>
-      <Tool>
+      </ToolItem>
+      <ToolItem functionality={"Select"}>
         <Select />
-      </Tool>
+      </ToolItem>
     </div>
   );
-}
+});
+
+export default ToolBox;

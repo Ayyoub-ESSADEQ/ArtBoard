@@ -1,10 +1,11 @@
+import { memo } from "react";
 import useStore from "../../state/store";
 
 interface ImageProps extends React.SVGProps<SVGImageElement> {
   id: string;
 }
 
-export default function Image(props: ImageProps) {
+export const Image = memo((props: ImageProps) => {
   const { setElementProps } = useStore();
 
   const handleImageLoad = (e: React.SyntheticEvent<SVGImageElement, Event>) => {
@@ -48,4 +49,4 @@ export default function Image(props: ImageProps) {
       />
     </>
   );
-}
+});

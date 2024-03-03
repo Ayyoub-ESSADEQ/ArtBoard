@@ -1,10 +1,12 @@
 // import useStore from "../../state/store";
 
+import { memo } from "react";
+
 interface RectangleProps extends React.SVGProps<SVGRectElement> {
   id: string;
 }
 
-export default function Circle(props: RectangleProps) {
+export const Circle = memo((props: RectangleProps) => {
   //   const { getElementProps, updateDrawing } = useStore((state) => state);
   return (
     <rect
@@ -13,4 +15,4 @@ export default function Circle(props: RectangleProps) {
       {...props}
     />
   );
-}
+});

@@ -1,8 +1,8 @@
-import { ChangeEventHandler, SVGProps, useRef } from "react";
+import { ChangeEventHandler, SVGProps, memo, useRef } from "react";
 
 interface TextProps extends SVGProps<SVGForeignObjectElement> {}
 
-export default function Text(props: TextProps) {
+export const Text = memo((props: TextProps) => {
   const text = useRef<string>("");
 
   const handleTextChange: ChangeEventHandler<HTMLDivElement> = (e) => {
@@ -26,4 +26,4 @@ export default function Text(props: TextProps) {
       </div>
     </foreignObject>
   );
-}
+});

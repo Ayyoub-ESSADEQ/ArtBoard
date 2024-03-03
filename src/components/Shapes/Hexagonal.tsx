@@ -1,8 +1,10 @@
+import { memo } from "react";
+
 interface ImageProps extends React.SVGProps<SVGImageElement> {
   id: string;
 }
 
-export default function Hexagonal(props: ImageProps) {
+export const Hexagonal = memo((props: ImageProps) => {
   return (
     <>
       <defs>
@@ -33,4 +35,4 @@ export default function Hexagonal(props: ImageProps) {
       />
     </>
   );
-}
+});
