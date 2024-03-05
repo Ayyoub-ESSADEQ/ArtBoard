@@ -44,11 +44,14 @@ const SketchBoard = memo(() => {
       onMouseUp={whiteboard.current.handleMouseUp}
       onWheel={whiteboard.current.handleMouseWheel}
       onContextMenu={(e) => e.preventDefault()}
-      className="absolute top-0 bg-lined-grid left-0 overflow-hidden"
+      className="absolute top-0 left-0 overflow-hidden"
       data-type="whiteboard"
       style={{
         backgroundPosition: `${backgroundPosition.x}px ${backgroundPosition.y}px`,
-        backgroundSize: `${2.9 / scale}rem ${2.9 / scale}rem`,
+        backgroundSize: `${(42) / scale}px ${42 / scale}px`,
+        backgroundImage: `radial-gradient(circle, #c8d3de ${
+          3 / scale
+        }px, #f0f4f7 ${3 / scale}px)`,
       }}
     >
       {initialDrawing.map(({ id, width, height, fill, x, y, type }) => {
@@ -64,6 +67,7 @@ const SketchBoard = memo(() => {
                   id={id}
                   x={x}
                   y={y}
+                  rx="15"
                 />
               </Resizer>
             );
@@ -133,4 +137,5 @@ const SketchBoard = memo(() => {
     </svg>
   );
 });
+
 export default SketchBoard;

@@ -4,7 +4,7 @@ import { create } from "zustand";
 export const Tool = {
   Rectangle: "cross-hair",
   Circle: "cross-hair",
-  Arrow: "cross-hair",
+  Arrow: "default",
   Text: "text",
   Pan: "grab",
   Select: "arrow",
@@ -22,10 +22,19 @@ interface Shape {
   y: number;
 }
 
+type ShapeEditorState =
+  | {
+      show: true;
+      x: number;
+      y: number;
+    }
+  | { show: false };
+
 type ViewBox = { x: number; y: number; width: number; height: number };
 type Coords = { x: number; y: number };
 
 export interface BearState {
+  shapeEditor: ShapeEditorState;
   toolInUseName: keyof typeof Tool;
   focusedComponentId: string;
   initialDrawing: Shape[];
@@ -47,6 +56,7 @@ export interface BearState {
   setElementProps: (id: string, props: object) => void;
   setWhiteboardCursor: (cursor: string) => void;
   setToolInUseName: (toolName: keyof typeof Tool) => void;
+  setShapeEditor: (shapeEditor: ShapeEditorState) => void;
 }
 
 const INITIAL_DRAWING = [
@@ -107,6 +117,7 @@ const INITIAL_DRAWING = [
 ];
 
 const useStore = create<BearState>()((set, get) => ({
+  shapeEditor: { show: false },
   whiteboardCursor: "arrow",
   toolInUseName: "Select",
   isCommentSectionToggeled: false,
@@ -152,13 +163,14 @@ const useStore = create<BearState>()((set, get) => ({
   },
 
   setElementProps(id, props) {
+
     set((state) => {
       const board = [...state.initialDrawing];
       const index = board.findIndex((shape) => shape.id === id);
       if (index === -1) return state;
 
       board[index] = { ...board[index], ...props };
-      return { ...state, initialDrawing: board };
+      return { ...state, shapeEditor: {show: false},initialDrawing: board };
     });
   },
 
@@ -176,6 +188,10 @@ const useStore = create<BearState>()((set, get) => ({
 
   setToolInUseName(toolName) {
     set((state) => ({ ...state, toolInUseName: toolName }));
+  },
+
+  setShapeEditor(shapeEditor) {
+    set((state) => ({ ...state, shapeEditor: shapeEditor }));
   },
 }));
 

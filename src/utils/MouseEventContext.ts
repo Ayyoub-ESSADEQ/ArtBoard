@@ -94,19 +94,19 @@ export class Whiteboard extends State {
     );
 
     setViewBox({
-      x: viewBox.x - (startPoint.x - viewBox.x) * (SCALING_FACTOR - 1),
-      y: viewBox.y - (startPoint.y - viewBox.y) * (SCALING_FACTOR - 1),
+      x: startPoint.x - (startPoint.x - viewBox.x) * SCALING_FACTOR,
+      y: startPoint.y - (startPoint.y - viewBox.y) * SCALING_FACTOR,
       width: viewBox.width * SCALING_FACTOR,
       height: viewBox.height * SCALING_FACTOR,
     });
 
     setBackgroundPosition({
       x:
-        backgroundPosition.x -
-        (startPoint.x - viewBox.x) * (SCALING_FACTOR - 1),
+        e.clientX +
+        (1 / (42 * SCALING_FACTOR)) * (e.clientX + backgroundPosition.x),
       y:
-        backgroundPosition.y -
-        (startPoint.x - viewBox.y) * (SCALING_FACTOR - 1),
+        e.clientY +
+        (1 / (42 * SCALING_FACTOR)) * (e.clientY + backgroundPosition.y),
     });
   }
 
@@ -148,6 +148,8 @@ export class Whiteboard extends State {
   }
 
   public handleMouseWheel(e: WheelEvent<SVGSVGElement>) {
+    const { setShapeEditor } = useStore.getState();
+    setShapeEditor({ show: false });
     this.handleZoom(e);
     this.handleScrollHorizontally(e);
     this.handleScrollVertically(e);
@@ -195,16 +197,9 @@ export class Whiteboard extends State {
       setDragging,
       setStartCoords,
       setFocusedComponentId,
+      setShapeEditor,
       toolInUseName,
     } = useStore.getState();
-
-    if (toolInUseName === "Pan") {
-      setFocusedComponentId("whiteboard");
-      this.context.changeState(this);
-      setDragging(true);
-      setStartCoords({ x: e.clientX, y: e.clientY });
-      return;
-    }
 
     setFocusedComponentId(target.id);
 
@@ -215,9 +210,13 @@ export class Whiteboard extends State {
         return;
 
       case WHITEBOARD:
+        if (toolInUseName !== "Pan") return;
+
         this.context.changeState(this);
         setDragging(true);
+        setShapeEditor({ show: false });
         setStartCoords({ x: e.clientX, y: e.clientY });
+
         return;
 
       case SHAPE:
@@ -228,9 +227,11 @@ export class Whiteboard extends State {
   }
 
   public handleMouseUp() {
-    const { setDragging, setWhiteboardCursor } = useStore.getState();
+    const { setDragging, setWhiteboardCursor, setShapeEditor } =
+      useStore.getState();
     setWhiteboardCursor("grab");
     setDragging(false);
+    setShapeEditor({ show: false });
   }
 }
 
@@ -274,8 +275,9 @@ export class Handler extends State {
   }
 
   public handleMouseUp() {
-    const { setDragging } = useStore.getState();
+    const { setDragging, setShapeEditor } = useStore.getState();
     setDragging(false);
+    setShapeEditor({ show: false });
     this.context.changeState(new Whiteboard());
   }
 
@@ -376,14 +378,14 @@ export class Shape extends State {
         this.context.getState().handleMouseDown(e);
         return;
     }
+    setDragging(true);
+    setStartCoords({ x: e.clientX, y: e.clientY });
 
     this.id = target.id;
     setFocusedComponentId(target.id);
 
     const { x, y } = getElementProps(this.id)!;
 
-    setDragging(true);
-    setStartCoords({ x: e.clientX, y: e.clientY });
     const svg = document.getElementById(WHITEBOARD)! as any;
     const point = new DOMPoint();
 
@@ -403,7 +405,9 @@ export class Shape extends State {
   }
 
   public handleMouseMove(e: MouseEvent<any>): void {
-    const { isDragging, setElementProps } = useStore.getState();
+    const { isDragging, setElementProps, setShapeEditor } = useStore.getState();
+    setShapeEditor({ show: false });
+
     if (!isDragging) return;
 
     const svg = document.getElementById(WHITEBOARD)! as any;

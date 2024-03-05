@@ -110,8 +110,18 @@ const ResizeHandlers = memo(
 );
 
 const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
-  const { scale, focusedComponentId } = useStore();
+  const { scale, focusedComponentId, setShapeEditor } = useStore();
   const id = useContext(idContext);
+  const edit = (e: React.MouseEvent<SVGRectElement>) => {
+    const target = e.target as SVGRectElement;
+    const { top, left } = target.getBoundingClientRect();
+
+    setShapeEditor({
+      show: true,
+      x: left + width / (2 * scale),
+      y: top,
+    });
+  };
 
   return (
     <g transform={`translate(${x}, ${y})`}>
@@ -125,6 +135,7 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
         className="stroke-blue-500  hover:cursor-move"
         data-type="shape"
         id={`${id}`}
+        onClick={edit}
       />
       {focusedComponentId === id ? (
         <ResizeHandlers width={width} height={height} />
