@@ -42,7 +42,7 @@ const ToolItem = (props: ToolProps) => {
 
 const ToolBox = memo(() => {
   return (
-    <div className="bg-white rounded-md shadow-md border-solid border-2 border-gray-200 p-1 box-border flex flex-row gap-1 fixed bottom-2 left-[50%] translate-x-[-50%]">
+    <div className="bg-white rounded-md shadow-md border-solid border-2 border-gray-200 p-1 box-border flex flex-col gap-1 fixed top-[50%] left-2 translate-y-[-50%]">
       <ToolItem functionality={"Rectangle"}>
         <Rectangle />
       </ToolItem>

@@ -24,6 +24,23 @@ abstract class State {
   public setContext(context: MouseEventContext) {
     this.context = context;
   }
+
+  public setCorrespondingState(type: string) {
+    switch (type) {
+      case HANDLER:
+        this.context.changeState(new Handler());
+        return this.context.getState().handleMouseDown;
+
+      case WHITEBOARD:
+        this.context.changeState(this);
+        this.context.changeState(new Handler());
+        return this.context.getState().handleMouseDown;
+
+      case SHAPE:
+        this.context.changeState(new Shape());
+        return this.context.getState().handleMouseDown;
+    }
+  }
 }
 
 class MouseEventContext {
@@ -82,7 +99,7 @@ export class Whiteboard extends State {
     } = useStore.getState();
 
     const point = new DOMPoint();
-    const SCALING_FACTOR = e.deltaY > 0 ? 1 / 1.1 : 1.1;
+    const SCALING_FACTOR = e.deltaY > 0 ? 1.1 : 1 / 1.1;
 
     point.x = e.clientX;
     point.y = e.clientY;
@@ -119,12 +136,12 @@ export class Whiteboard extends State {
     setViewBox({
       width: viewBox.width,
       height: viewBox.height,
-      x: viewBox.x - e.deltaY,
+      x: viewBox.x + e.deltaY,
       y: viewBox.y,
     });
 
     setBackgroundPosition({
-      x: backgroundPosition.x + e.deltaY,
+      x: backgroundPosition.x - e.deltaY,
       y: backgroundPosition.y,
     });
   }
@@ -137,13 +154,13 @@ export class Whiteboard extends State {
     setViewBox({
       width: viewBox.width,
       height: viewBox.height,
-      x: viewBox.x - e.deltaX,
-      y: viewBox.y - e.deltaY,
+      x: viewBox.x + e.deltaX,
+      y: viewBox.y + e.deltaY,
     });
 
     setBackgroundPosition({
-      x: backgroundPosition.x + e.deltaX,
-      y: backgroundPosition.y + e.deltaY,
+      x: backgroundPosition.x - e.deltaX,
+      y: backgroundPosition.y - e.deltaY,
     });
   }
 
@@ -209,21 +226,17 @@ export class Whiteboard extends State {
         this.context.getState().handleMouseDown(e);
         return;
 
-      case WHITEBOARD:
-        if (toolInUseName !== "Pan") return;
-
-        this.context.changeState(this);
-        setDragging(true);
-        setShapeEditor({ show: false });
-        setStartCoords({ x: e.clientX, y: e.clientY });
-
-        return;
-
       case SHAPE:
         this.context.changeState(new Shape());
         this.context.getState().handleMouseDown(e);
         return;
     }
+
+    if (toolInUseName !== "Pan") return;
+
+    setDragging(true);
+    setShapeEditor({ show: false });
+    setStartCoords({ x: e.clientX, y: e.clientY });
   }
 
   public handleMouseUp() {

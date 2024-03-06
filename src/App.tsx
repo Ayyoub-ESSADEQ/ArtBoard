@@ -3,6 +3,7 @@ import Whiteboard from "./components/Whiteboard";
 import ToolBox from "./components/ToolBox";
 import { SidePanel } from "./components/SidePanel";
 import Overlay from "./components/Overlay";
+import ZoomIndicator from "./components/ZoomIndicator";
 function App() {
   return (
     <div className="flex flex-row w-full h-full relative select-none">
@@ -11,6 +12,7 @@ function App() {
       <Header></Header>
       <SidePanel />
       <ToolBox />
+      <ZoomIndicator />
     </div>
   );
 }
