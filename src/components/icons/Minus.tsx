@@ -1,4 +1,6 @@
-export function Minus(props: Readonly<React.SVGProps<SVGSVGElement>>) {
+import { memo } from "react";
+
+export const Minus = memo((props: Readonly<React.SVGProps<SVGSVGElement>>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -13,4 +15,4 @@ export function Minus(props: Readonly<React.SVGProps<SVGSVGElement>>) {
       ></path>
     </svg>
   );
-}
+});

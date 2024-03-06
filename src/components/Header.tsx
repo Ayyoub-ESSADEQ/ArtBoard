@@ -30,7 +30,6 @@ export default function Header() {
         <Side
           onClick={() => {
             setCommentSectionToToggled(!isCommentSectionToggeled);
-            console.log("Hello world");
           }}
           className="w-7 h-7 text-gray-600 justify-center rounded-md hover:cursor-pointer hover:bg-gray-100"
         >

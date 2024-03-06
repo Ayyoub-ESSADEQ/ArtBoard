@@ -25,7 +25,6 @@ const ToolItem = (props: ToolProps) => {
   const setToolAndCursor = () => {
     setToolInUseName(props.functionality);
     setWhiteboardCursor(Tool[props.functionality]);
-    console.log(Tool[props.functionality]);
   };
 
   return (

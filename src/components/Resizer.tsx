@@ -7,6 +7,7 @@ import {
 } from "react";
 import useStore from "../state/store";
 import { Rectangle } from "./Shapes/Rectangle";
+// import { Text } from "./Shapes/Text";
 
 type Element = "div" | "svg" | "rect" | "circle";
 type Orientation =
@@ -125,6 +126,7 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
 
   return (
     <g transform={`translate(${x}, ${y})`}>
+
       <Rectangle
         x={0}
         y={0}
@@ -142,6 +144,9 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
       ) : (
         <></>
       )}
+        
+      {/* <Text x={20} y={20} width={width-40} height={height-20}/> */}
+
     </g>
   );
 });

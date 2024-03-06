@@ -15,7 +15,7 @@ export const Text = memo((props: TextProps) => {
         contentEditable="plaintext-only"
         onInput={handleTextChange}
         suppressContentEditableWarning={true}
-        className="border-none outline-none focus:border-none focus:outline-none"
+        className="border-none bg-blue-400 text-left text-wrap outline-none focus:border-none focus:outline-none"
       >
         Over 17,000 documents from HazteOir and CitizenGO, Spanish right-wing
         campaigning organizations. Their links to Spain's far-right political

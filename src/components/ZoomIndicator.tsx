@@ -7,7 +7,12 @@ import { Plus } from "./icons/Plus";
 const SCALING_FACTOR = 1.1;
 
 const ZoomIndicator = memo(() => {
-  const { scale, setScale, setViewBox, viewBox } = useStore();
+  const { scale, viewBox, isCommentSectionToggeled, setScale, setViewBox } =
+    useStore();
+  const right_offset = isCommentSectionToggeled
+    ? "right-[308px]"
+    : "right-[8px]";
+    
   const className =
     "w-9 h-9 flex items-center hover:bg-[#788896] hover:cursor-pointer hover:border-0 hover:text-white justify-center border-x-[#fafbfc] border";
   const toPercentage = (n: number) => Math.round(n * 100) + "%";
@@ -32,7 +37,9 @@ const ZoomIndicator = memo(() => {
   };
 
   return (
-    <div className="flex h-9 text-[#7c8b99] font-medium overflow-hidden w-fit border-box items-center border border-solid  rounded-md justify-center flex-row bg-white shadow-md fixed right-2 bottom-2">
+    <div
+      className={`flex h-9 text-[#7c8b99] ${right_offset} font-medium overflow-hidden w-fit border-box items-center border border-solid  rounded-md justify-center flex-row bg-white shadow-md fixed bottom-2`}
+    >
       <div className={className} onClick={() => zoom(SCALING_FACTOR)}>
         <Minus />
       </div>
