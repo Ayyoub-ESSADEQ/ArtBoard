@@ -10,12 +10,14 @@ import { Hexagonal } from "./Shapes/Hexagonal";
 import useStore from "../state/store";
 import Resizer from "./Resizer";
 import MouseEventContext, { Whiteboard } from "../utils/MouseEventContext";
+import Planner from "./Shapes/Planner";
+// import useWebsocket from "../hooks/useWebsocket";
 
 const SketchBoard = memo(() => {
   const whiteboardRef = useRef<SVGSVGElement>(null);
   const whiteboard = useRef(new MouseEventContext(new Whiteboard()));
   const {
-    initialDrawing,
+    board,
     backgroundPosition,
     viewBox,
     scale,
@@ -34,6 +36,8 @@ const SketchBoard = memo(() => {
     whiteboard.style.cursor = `${whiteboardCursor}`;
   }, [whiteboardCursor]);
 
+  // useWebsocket(whiteboardRef);
+
   return (
     <svg
       id="whiteboard"
@@ -48,13 +52,14 @@ const SketchBoard = memo(() => {
       data-type="whiteboard"
       style={{
         backgroundPosition: `${backgroundPosition.x}px ${backgroundPosition.y}px`,
-        backgroundSize: `${(42) / scale}px ${42 / scale}px`,
+        backgroundSize: `${42 / scale}px ${42 / scale}px`,
         backgroundImage: `radial-gradient(circle, #c8d3de ${
           3 / scale
         }px, #f0f4f7 ${3 / scale}px)`,
       }}
     >
-      {initialDrawing.map(({ id, width, height, fill, x, y, type }) => {
+      <Planner />
+      {board.map(({ id, width, height, fill, x, y, type, href }) => {
         switch (type) {
           case "rect":
             return (
@@ -97,7 +102,7 @@ const SketchBoard = memo(() => {
                   key={id}
                   width={width}
                   height={height}
-                  href="https://cdn.dribbble.com/users/2635269/screenshots/18048306/media/139de3faf49d288071a1dc7a94dad10a.png?resize=1000x750&vertical=center"
+                  href={href}
                 />
               </Resizer>
             );

@@ -1,9 +1,8 @@
 import useStore from "../state/store";
 import { MouseEvent, WheelEvent } from "react";
+import mouseToSvgCoords from "./mouseToSvgCoords";
 
 type GlobalTypes = "whiteboard" | "handler" | "shape";
-
-type HTMLSVGElement = HTMLElement & SVGSVGElement;
 
 interface Coords {
   x: number;
@@ -12,7 +11,7 @@ interface Coords {
   height: number;
 }
 
-/// Here is the state intereface that each concrete implementation should implement
+/// Here is the state interface that each concrete implementation should implement
 abstract class State {
   public abstract handleMouseDown(e: MouseEvent<SVGSVGElement>): void;
   public abstract handleMouseUp(e: MouseEvent<SVGSVGElement>): void;
@@ -24,7 +23,7 @@ abstract class State {
     this.context = context;
   }
 
-  public CommonMouseDownBehaviour(type: GlobalTypes) {
+  public manageStateTransition(type: GlobalTypes) {
     switch (type) {
       case "handler":
         this.context.changeState(new Handler());
@@ -123,13 +122,18 @@ export class Whiteboard extends State {
   private handleScrollHorizontally = (e: WheelEvent<SVGSVGElement>) => {
     if (!e.shiftKey) return;
 
-    const { backgroundPosition, viewBox, setBackgroundPosition, setViewBox } =
-      useStore.getState();
+    const {
+      backgroundPosition,
+      viewBox,
+      scale,
+      setBackgroundPosition,
+      setViewBox,
+    } = useStore.getState();
 
     setViewBox({
       width: viewBox.width,
       height: viewBox.height,
-      x: viewBox.x + e.deltaY,
+      x: viewBox.x + e.deltaY * scale,
       y: viewBox.y,
     });
 
@@ -141,14 +145,19 @@ export class Whiteboard extends State {
 
   private handleScrollVertically = (e: WheelEvent<SVGSVGElement>) => {
     if (e.shiftKey || e.ctrlKey) return;
-    const { backgroundPosition, viewBox, setBackgroundPosition, setViewBox } =
-      useStore.getState();
+    const {
+      backgroundPosition,
+      viewBox,
+      scale,
+      setBackgroundPosition,
+      setViewBox,
+    } = useStore.getState();
 
     setViewBox({
       width: viewBox.width,
       height: viewBox.height,
-      x: viewBox.x + e.deltaX,
-      y: viewBox.y + e.deltaY,
+      x: viewBox.x + e.deltaX * scale,
+      y: viewBox.y + e.deltaY * scale,
     });
 
     setBackgroundPosition({
@@ -172,13 +181,16 @@ export class Whiteboard extends State {
       backgroundPosition,
       startCoords,
       isDragging,
+      toolInUseName,
       setViewBox,
       setBackgroundPosition,
-      setStartCoords,
       setWhiteboardCursor,
+      setStartCoords,
     } = useStore.getState();
 
     if (!isDragging) return;
+
+    if (toolInUseName === "Pan") setWhiteboardCursor("grabbing");
 
     const deltaX = e.clientX - startCoords.x;
     const deltaY = e.clientY - startCoords.y;
@@ -187,8 +199,6 @@ export class Whiteboard extends State {
       x: backgroundPosition.x + deltaX,
       y: backgroundPosition.y + deltaY,
     });
-
-    setWhiteboardCursor("grabbing");
 
     setViewBox({
       width: viewBox.width,
@@ -204,7 +214,7 @@ export class Whiteboard extends State {
     const target = e.target as HTMLElement;
     const type = target.dataset.type as GlobalTypes;
     if (type !== this.type) {
-      this.CommonMouseDownBehaviour(type)(e);
+      this.manageStateTransition(type)(e);
       return;
     }
 
@@ -226,10 +236,10 @@ export class Whiteboard extends State {
   };
 
   public handleMouseUp() {
-    const { setDragging, setWhiteboardCursor, setShapeEditor } =
+    const { setDragging, setShapeEditor, toolInUseName, setWhiteboardCursor } =
       useStore.getState();
-    setWhiteboardCursor("grab");
     setDragging(false);
+    if (toolInUseName === "Pan") setWhiteboardCursor("grab");
     setShapeEditor({ show: false });
   }
 }
@@ -250,7 +260,7 @@ export class Handler extends State {
     const type = target.dataset.type as GlobalTypes;
 
     if (type !== this.type) {
-      this.CommonMouseDownBehaviour(type)(e);
+      this.manageStateTransition(type)(e);
       return;
     }
 
@@ -280,13 +290,7 @@ export class Handler extends State {
     const { isDragging, setElementProps } = useStore.getState();
     if (!isDragging) return;
 
-    const svg = Whiteboard.whiteboardReference?.current;
-    const point = new DOMPoint();
-
-    point.x = e.clientX;
-    point.y = e.clientY;
-
-    const cursor = point.matrixTransform(svg?.getScreenCTM()?.inverse());
+    const cursor = mouseToSvgCoords(e);
     const deltaX = cursor.x - this.x;
     const deltaY = cursor.y - this.y;
 
@@ -359,7 +363,7 @@ export class Shape extends State {
     const type = target.dataset.type as GlobalTypes;
 
     if (type !== this.type) {
-      this.CommonMouseDownBehaviour(type)(e);
+      this.manageStateTransition(type)(e);
       return;
     }
 
@@ -370,21 +374,14 @@ export class Shape extends State {
       setFocusedComponentId,
     } = useStore.getState();
 
+    this.id = target.id;
+
     setDragging(true);
     setStartCoords({ x: e.clientX, y: e.clientY });
-
-    this.id = target.id;
     setFocusedComponentId(target.id);
 
     const { x, y } = getElementProps(this.id)!;
-
-    const svg = document.getElementById("whiteboard")! as HTMLSVGElement;
-    const point = new DOMPoint();
-
-    point.x = e.clientX;
-    point.y = e.clientY;
-
-    const startPoint = point.matrixTransform(svg.getScreenCTM()?.inverse());
+    const startPoint = mouseToSvgCoords(e);
 
     this.deltaX = startPoint.x - x;
     this.deltaY = startPoint.y - y;
@@ -398,18 +395,12 @@ export class Shape extends State {
 
   public handleMouseMove = (e: MouseEvent<SVGSVGElement>): void => {
     const { isDragging, setElementProps, setShapeEditor } = useStore.getState();
-    setShapeEditor({ show: false });
 
     if (!isDragging) return;
 
-    const svg = document.getElementById("whiteboard")! as HTMLSVGElement;
-    const point = new DOMPoint();
+    const startPoint = mouseToSvgCoords(e);
 
-    point.x = e.clientX;
-    point.y = e.clientY;
-
-    const startPoint = point.matrixTransform(svg.getScreenCTM()?.inverse());
-
+    setShapeEditor({ show: false });
     setElementProps(this.id, {
       x: startPoint.x - this.deltaX,
       y: startPoint.y - this.deltaY,

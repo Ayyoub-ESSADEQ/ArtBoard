@@ -3,13 +3,13 @@ import { create } from "zustand";
 
 export const Tool = {
   Rectangle: "cross-hair",
+  Sticker: "default",
   Circle: "cross-hair",
+  Select: "default",
   Arrow: "default",
+  Image: "default",
   Text: "text",
   Pan: "grab",
-  Select: "arrow",
-  Sticker: "arrow",
-  Image: "arrow",
 };
 
 interface Shape {
@@ -20,6 +20,7 @@ interface Shape {
   id: string;
   x: number;
   y: number;
+  href?: string;
 }
 
 type ShapeEditorState =
@@ -37,7 +38,7 @@ export interface BearState {
   shapeEditor: ShapeEditorState;
   toolInUseName: keyof typeof Tool;
   focusedComponentId: string;
-  initialDrawing: Shape[];
+  board: Shape[];
   backgroundPosition: Coords;
   isDragging: boolean;
   isCommentSectionToggeled: boolean;
@@ -45,6 +46,7 @@ export interface BearState {
   viewBox: ViewBox;
   whiteboardCursor: string;
   scale: number;
+  // collaboratorCursorPosition: Coords | undefined;
   setScale: (factor: number) => void;
   setViewBox: (viewbox: ViewBox) => void;
   setStartCoords: (startCoords: Coords) => void;
@@ -57,6 +59,8 @@ export interface BearState {
   setWhiteboardCursor: (cursor: string) => void;
   setToolInUseName: (toolName: keyof typeof Tool) => void;
   setShapeEditor: (shapeEditor: ShapeEditorState) => void;
+  addBoardElement: (element: Shape) => void;
+  // setCollaboratorCursor: (shapeEditor: ShapeEditorState) => void;
 }
 
 const INITIAL_DRAWING = [
@@ -95,6 +99,7 @@ const INITIAL_DRAWING = [
     width: 200,
     height: 300,
     fill: "red",
+    href: "https://cdn.dribbble.com/userupload/13308142/file/still-02a795b0bd22783893f7f5167eb8b0b3.png?resize=400x300&vertical=center",
   },
   {
     id: nanoid(6),
@@ -126,7 +131,7 @@ const useStore = create<BearState>()((set, get) => ({
   scale: 1,
   startCoords: { x: 0, y: 0 },
   isDragging: false,
-  initialDrawing: INITIAL_DRAWING,
+  board: INITIAL_DRAWING,
   viewBox: { x: 0, y: 0, width: screen.availWidth, height: screen.availHeight },
   setScale(factor) {
     set((state) => ({ ...state, scale: factor }));
@@ -159,18 +164,17 @@ const useStore = create<BearState>()((set, get) => ({
   },
 
   getElementProps: (id) => {
-    return get().initialDrawing.find((shape) => shape.id === id);
+    return get().board.find((shape) => shape.id === id);
   },
 
   setElementProps(id, props) {
-
     set((state) => {
-      const board = [...state.initialDrawing];
+      const board = [...state.board];
       const index = board.findIndex((shape) => shape.id === id);
       if (index === -1) return state;
 
       board[index] = { ...board[index], ...props };
-      return { ...state, shapeEditor: {show: false},initialDrawing: board };
+      return { ...state, shapeEditor: { show: false }, board: board };
     });
   },
 
@@ -192,6 +196,10 @@ const useStore = create<BearState>()((set, get) => ({
 
   setShapeEditor(shapeEditor) {
     set((state) => ({ ...state, shapeEditor: shapeEditor }));
+  },
+
+  addBoardElement(element: Shape) {
+    set((state) => ({ ...state, board: [...get().board, element] }));
   },
 }));
 

@@ -1,6 +1,5 @@
 import { Circle } from "./icons/Circle";
 import { Rectangle } from "./icons/Rectangle";
-import { Image } from "./icons/Image";
 import { Text } from "./icons/Text";
 import { Sticker } from "./icons/Sticker";
 import { Drag } from "./icons/Drag";
@@ -8,6 +7,7 @@ import { Select } from "./icons/Select";
 import { Arrow } from "./icons/Arrow";
 import useStore, { Tool } from "../state/store";
 import { memo } from "react";
+import FileUpload from "./Shapes/FileUpload";
 
 interface ToolProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,11 +16,11 @@ interface ToolProps {
 }
 
 const ToolItem = (props: ToolProps) => {
-  const { toolInUseName } = useStore();
-  const { setToolInUseName, setWhiteboardCursor } = useStore();
+  const { toolInUseName, setToolInUseName, setWhiteboardCursor } = useStore();
+  const { functionality } = props;
 
-  const active =
-    toolInUseName === props.functionality ? "bg-violet-300" : "bg-white";
+  const active = toolInUseName === functionality ? "bg-violet-300" : "bg-white";
+  const hover = active === "bg-white" ? "hover:bg-gray-100" : "";
 
   const setToolAndCursor = () => {
     setToolInUseName(props.functionality);
@@ -30,9 +30,7 @@ const ToolItem = (props: ToolProps) => {
   return (
     <div
       onClick={setToolAndCursor}
-      className={`h-12 w-12 select-none ${
-        active === "bg-white" ? "hover:bg-gray-100" : ""
-      } cursor-pointer ${active} rounded-md flex justify-center items-center`}
+      className={`h-12 w-12 select-none ${hover} cursor-pointer ${active} rounded-md flex justify-center items-center`}
     >
       {props?.children}
     </div>
@@ -49,7 +47,7 @@ const ToolBox = memo(() => {
         <Circle />
       </ToolItem>
       <ToolItem functionality={"Image"}>
-        <Image />
+        <FileUpload />
       </ToolItem>
       <ToolItem functionality={"Text"}>
         <Text />

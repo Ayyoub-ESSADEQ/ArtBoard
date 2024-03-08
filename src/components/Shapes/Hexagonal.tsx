@@ -18,7 +18,7 @@ export const Hexagonal = memo((props: ImageProps) => {
           {/* We need to add the new element here and that's it */}
           <polygon
             points="0.5,0.005 0.995,0.25 0.995,0.75 0.5,0.995 0.005,0.75 0.005,0.25"
-            fill="none"
+            fill="yellow"
             stroke="black"
             strokeWidth="0.01"
           />

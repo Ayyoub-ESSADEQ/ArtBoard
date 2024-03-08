@@ -7,7 +7,6 @@ import {
 } from "react";
 import useStore from "../state/store";
 import { Rectangle } from "./Shapes/Rectangle";
-// import { Text } from "./Shapes/Text";
 
 type Element = "div" | "svg" | "rect" | "circle";
 type Orientation =
@@ -111,12 +110,13 @@ const ResizeHandlers = memo(
 );
 
 const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
-  const { scale, focusedComponentId, setShapeEditor } = useStore();
+  const { scale, focusedComponentId, toolInUseName, setShapeEditor } =
+    useStore();
   const id = useContext(idContext);
   const edit = (e: React.MouseEvent<SVGRectElement>) => {
+    if (toolInUseName !== "Select") return;
     const target = e.target as SVGRectElement;
     const { top, left } = target.getBoundingClientRect();
-
     setShapeEditor({
       show: true,
       x: left + width / (2 * scale),
@@ -126,7 +126,6 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
 
   return (
     <g transform={`translate(${x}, ${y})`}>
-
       <Rectangle
         x={0}
         y={0}
@@ -144,9 +143,6 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
       ) : (
         <></>
       )}
-        
-      {/* <Text x={20} y={20} width={width-40} height={height-20}/> */}
-
     </g>
   );
 });

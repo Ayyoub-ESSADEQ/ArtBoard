@@ -18,19 +18,16 @@ export const Image = memo((props: ImageProps) => {
     <>
       <defs>
         <pattern
-          id="star"
+          id={props.id}
           patternUnits="objectBoundingBox"
           width="1"
           height="1"
           patternContentUnits="objectBoundingBox"
         >
-          <image
-            href="https://cdn.dribbble.com/users/2635269/screenshots/18048306/media/139de3faf49d288071a1dc7a94dad10a.png?resize=1000x750&vertical=center"
-            onLoad={handleImageLoad}
-          />
+          <image href={props.href} onLoad={handleImageLoad} />
 
           <image
-            href="https://cdn.dribbble.com/users/2635269/screenshots/18048306/media/139de3faf49d288071a1dc7a94dad10a.png?resize=1000x750&vertical=center"
+            href={props.href}
             width="1"
             height="1"
             preserveAspectRatio="none"
@@ -45,7 +42,7 @@ export const Image = memo((props: ImageProps) => {
         // key={props.key}
         width={props.width}
         height={props.height}
-        fill="url(#star)"
+        fill={`url(#${props.id})`}
       />
     </>
   );
