@@ -10,7 +10,6 @@ import { Hexagonal } from "./Shapes/Hexagonal";
 import useStore from "../state/store";
 import Resizer from "./Resizer";
 import MouseEventContext, { Whiteboard } from "../utils/MouseEventContext";
-import Planner from "./Shapes/Planner";
 // import useWebsocket from "../hooks/useWebsocket";
 
 const SketchBoard = memo(() => {
@@ -58,7 +57,6 @@ const SketchBoard = memo(() => {
         }px, #f0f4f7 ${3 / scale}px)`,
       }}
     >
-      <Planner />
       {board.map(({ id, width, height, fill, x, y, type, href }) => {
         switch (type) {
           case "rect":

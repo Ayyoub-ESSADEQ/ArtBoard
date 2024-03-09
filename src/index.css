@@ -76,4 +76,19 @@ html,
   .custom-scrollbar::-webkit-scrollbar-thumb:active {
     background-color: #868686;
   }
+
+  .ropa-sans-regular {
+    font-family: "Ropa Sans", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .ropa-sans-regular-italic {
+    font-family: "Ropa Sans", sans-serif;
+    font-style: italic;
+  }
+  
+  .flex-row-center {
+    @apply flex flex-row items-center;
+  }
 }

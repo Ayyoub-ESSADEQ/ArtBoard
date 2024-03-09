@@ -11,11 +11,26 @@ interface Coords {
   height: number;
 }
 
+/**
+ * @interface CustomMouseEvent
+ */
+interface CustomMouseEvent extends MouseEvent<SVGSVGElement> {
+  /**
+   * indicates that the state is being change from another state
+   * meaning that the state should behave in a normal way without
+   * using manageStateTransition
+   *
+   * @type {boolean}
+   * @memberof CustomMouseEvent
+   */
+  skipStateTransition?: boolean;
+}
+
 /// Here is the state interface that each concrete implementation should implement
 abstract class State {
-  public abstract handleMouseDown(e: MouseEvent<SVGSVGElement>): void;
-  public abstract handleMouseUp(e: MouseEvent<SVGSVGElement>): void;
-  public abstract handleMouseMove(e: MouseEvent<SVGSVGElement>): void;
+  public abstract handleMouseDown(e: CustomMouseEvent): void;
+  public abstract handleMouseUp(e: CustomMouseEvent): void;
+  public abstract handleMouseMove(e: CustomMouseEvent): void;
   public abstract handleMouseWheel(e: WheelEvent<SVGSVGElement>): void;
   protected context!: MouseEventContext;
 
@@ -23,7 +38,7 @@ abstract class State {
     this.context = context;
   }
 
-  public manageStateTransition(type: GlobalTypes) {
+  public manageStateTransition = (type: GlobalTypes) => {
     switch (type) {
       case "handler":
         this.context.changeState(new Handler());
@@ -37,7 +52,7 @@ abstract class State {
         this.context.changeState(new Shape());
         return this.context.getState().handleMouseDown;
     }
-  }
+  };
 }
 
 class MouseEventContext {
@@ -48,15 +63,15 @@ class MouseEventContext {
     this.state = initialState;
   }
 
-  public handleMouseDown = (e: MouseEvent<SVGSVGElement>) => {
+  public handleMouseDown = (e: CustomMouseEvent) => {
     this.state.handleMouseDown(e);
   };
 
-  public handleMouseUp = (e: MouseEvent<SVGSVGElement>) => {
+  public handleMouseUp = (e: CustomMouseEvent) => {
     this.state.handleMouseUp(e);
   };
 
-  public handleMouseMove = (e: MouseEvent<SVGSVGElement>) => {
+  public handleMouseMove = (e: CustomMouseEvent) => {
     this.state.handleMouseMove(e);
   };
 
@@ -174,7 +189,7 @@ export class Whiteboard extends State {
     this.handleScrollVertically(e);
   };
 
-  public handleMouseMove = (e: MouseEvent<SVGSVGElement>): void => {
+  public handleMouseMove = (e: CustomMouseEvent): void => {
     const {
       scale,
       viewBox,
@@ -210,10 +225,11 @@ export class Whiteboard extends State {
     setStartCoords({ x: e.clientX, y: e.clientY });
   };
 
-  public handleMouseDown = (e: MouseEvent<SVGSVGElement>) => {
+  public handleMouseDown = (e: CustomMouseEvent) => {
     const target = e.target as HTMLElement;
     const type = target.dataset.type as GlobalTypes;
-    if (type !== this.type) {
+
+    if (!e.skipStateTransition && type !== this.type) {
       this.manageStateTransition(type)(e);
       return;
     }
@@ -226,8 +242,7 @@ export class Whiteboard extends State {
       toolInUseName,
     } = useStore.getState();
 
-    setFocusedComponentId(target.id);
-
+    if (!e.skipStateTransition) setFocusedComponentId(target.id);
     if (toolInUseName !== "Pan") return;
 
     setDragging(true);
@@ -255,7 +270,7 @@ export class Handler extends State {
 
   public handleMouseWheel = () => {};
 
-  public handleMouseDown = (e: MouseEvent<SVGSVGElement>) => {
+  public handleMouseDown = (e: CustomMouseEvent) => {
     const target = e.target as HTMLElement;
     const type = target.dataset.type as GlobalTypes;
 
@@ -286,7 +301,7 @@ export class Handler extends State {
     this.context.changeState(new Whiteboard());
   };
 
-  public handleMouseMove = (e: MouseEvent<SVGSVGElement>): void => {
+  public handleMouseMove = (e: CustomMouseEvent): void => {
     const { isDragging, setElementProps } = useStore.getState();
     if (!isDragging) return;
 
@@ -355,10 +370,11 @@ export class Shape extends State {
   private deltaX = 0;
   private deltaY = 0;
   private type = "shape";
+  private tool = "Select";
 
   public handleMouseWheel() {}
 
-  public handleMouseDown = (e: MouseEvent<SVGSVGElement>) => {
+  public handleMouseDown = (e: CustomMouseEvent) => {
     const target = e.target as HTMLElement;
     const type = target.dataset.type as GlobalTypes;
 
@@ -372,7 +388,17 @@ export class Shape extends State {
       setStartCoords,
       getElementProps,
       setFocusedComponentId,
+      toolInUseName,
     } = useStore.getState();
+
+    if (toolInUseName === "Pan") {
+      e.skipStateTransition = true;
+      this.context.changeState(new Whiteboard());
+      this.context.getState().handleMouseDown(e);
+      return;
+    }
+
+    if (this.tool !== toolInUseName) return;
 
     this.id = target.id;
 
@@ -393,7 +419,7 @@ export class Shape extends State {
     this.context.changeState(new Whiteboard());
   };
 
-  public handleMouseMove = (e: MouseEvent<SVGSVGElement>): void => {
+  public handleMouseMove = (e: CustomMouseEvent): void => {
     const { isDragging, setElementProps, setShapeEditor } = useStore.getState();
 
     if (!isDragging) return;

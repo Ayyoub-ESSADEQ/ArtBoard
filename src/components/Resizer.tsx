@@ -133,7 +133,7 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
         height={height}
         fill="transparent"
         strokeWidth={focusedComponentId === id ? 2 * scale : 0}
-        className="stroke-blue-500  hover:cursor-move"
+        className="stroke-blue-500"
         data-type="shape"
         id={`${id}`}
         onClick={edit}

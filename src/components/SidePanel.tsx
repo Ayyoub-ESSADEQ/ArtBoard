@@ -15,7 +15,10 @@ export const SidePanel = memo(() => {
       <div className="w-full h-full flex flex-col items-center">
         <div className="flex h-10 w-full items-center text-gray-500 flex-row justify-between border-box px-2">
           <div className="font-medium">Comments</div>
-          <div onClick={()=>setCommentSectionToToggled(false)} className="rounded-md hover:cursor-pointer hover:bg-gray-100 h-7 aspect-square flex items-center justify-center">
+          <div
+            onClick={() => setCommentSectionToToggled(false)}
+            className="rounded-md hover:cursor-pointer hover:bg-gray-100 h-7 aspect-square flex items-center justify-center"
+          >
             <RightPanelCollapse />
           </div>
         </div>
