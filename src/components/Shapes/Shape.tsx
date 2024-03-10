@@ -1,11 +1,11 @@
 import { memo } from "react";
 import useStore from "../../state/store";
 
-interface ImageProps extends React.SVGProps<SVGImageElement> {
+interface ShapeProps extends React.SVGProps<SVGImageElement> {
   id: string;
 }
 
-export const Image = memo((props: ImageProps) => {
+export const Shape = memo((props: ShapeProps) => {
   const { setElementProps } = useStore();
 
   const handleImageLoad = (e: React.SyntheticEvent<SVGImageElement, Event>) => {

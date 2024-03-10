@@ -1,10 +1,7 @@
-import { Share } from "./icons/Share";
-import { Messages } from "./icons/Messages";
-import useStore from "../state/store";
-import DrawingBoard from "./icons/DrawingBoard";
-import Assets from "./icons/Assets";
-import AssetsPanel from "./AssetPanel";
 import { useState } from "react";
+import useStore from "../state/store";
+import AssetsPanel from "./AssetPanel";
+import * as Icons from "./icons/Icons";
 
 const Collaborator = () => {
   return (
@@ -32,13 +29,13 @@ export default function Header() {
             className={`${visibility} w-[325px] border-r-2`}
             onMouseLeave={() => setShowAssets(false)}
           />
-          <Assets />
+          <Icons.Assets />
         </span>
         <span className="font-bold text-[#788896] px-2 hover:bg-[#edf1f5] hover:cursor-pointer rounded-sm">
           MY FILES
         </span>
         <span className="text-[#c3cfd9]">/</span>
-        <DrawingBoard className="text-violet-500 h-11" />
+        <Icons.DrawingBoard className="text-violet-500 h-11" />
         <span className="text-[#293845] font-medium">
           Whiteboard Collaboration Project
         </span>
@@ -54,12 +51,12 @@ export default function Header() {
           onClick={toggleComments}
           className="flex-row-center border-l-2 h-11 w-11 text-gray-600 justify-center hover:cursor-pointer hover:bg-gray-100"
         >
-          <Messages />
+          <Icons.Messages />
         </div>
 
         <div className="flex-row-center text-[#293845] border-l-2 h-11 px-2">
           <div className="flex-row-center rounded-full bg-[#edf1f5] hover:cursor-pointer gap-2 py-1 px-2">
-            <Share />
+            <Icons.Share />
             <span className="ropa-sans-regular-italic">Share</span>
           </div>
         </div>

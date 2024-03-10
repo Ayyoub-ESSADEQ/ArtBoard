@@ -149,7 +149,7 @@ const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
 
 const Resizer = memo((props: Readonly<ResizerProps>) => {
   const { getElementProps } = useStore((state) => state);
-  const { width, height, x, y } = getElementProps(props.children.key!)!;
+  const { width, height, x, y } = getElementProps(props.children.key!)!.props;
   return (
     <>
       {props.children}

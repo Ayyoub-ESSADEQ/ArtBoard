@@ -1,4 +1,4 @@
-import useStore from "../state/store";
+import useStore, { Tool } from "../state/store";
 import { MouseEvent, WheelEvent } from "react";
 import mouseToSvgCoords from "./mouseToSvgCoords";
 
@@ -254,7 +254,7 @@ export class Whiteboard extends State {
     const { setDragging, setShapeEditor, toolInUseName, setWhiteboardCursor } =
       useStore.getState();
     setDragging(false);
-    if (toolInUseName === "Pan") setWhiteboardCursor("grab");
+    if (toolInUseName === "Pan") setWhiteboardCursor(Tool[toolInUseName]);
     setShapeEditor({ show: false });
   }
 }
@@ -267,24 +267,28 @@ export class Handler extends State {
   private height!: number;
   private orientation!: string;
   private type = "handler";
+  private preserveAspectRatio = false;
 
   public handleMouseWheel = () => {};
 
   public handleMouseDown = (e: CustomMouseEvent) => {
     const target = e.target as HTMLElement;
-    const type = target.dataset.type as GlobalTypes;
+    const dataType = target.dataset.type as GlobalTypes;
 
-    if (type !== this.type) {
-      this.manageStateTransition(type)(e);
+    if (dataType !== this.type) {
+      this.manageStateTransition(dataType)(e);
       return;
     }
 
-    const { setFocusedComponentId, setDragging } = useStore.getState();
+    const { setFocusedComponentId, setDragging, getElementProps } =
+      useStore.getState();
+
     this.id = target.id;
     setFocusedComponentId(this.id);
 
-    const { getElementProps } = useStore.getState();
-    const { x, y, width, height } = getElementProps(this.id)!;
+    const { type, props } = getElementProps(this.id)!;
+    const { x, y, width, height } = props;
+    this.preserveAspectRatio = type == "shape";
 
     this.x = x;
     this.y = y;
@@ -308,6 +312,7 @@ export class Handler extends State {
     const cursor = mouseToSvgCoords(e);
     const deltaX = cursor.x - this.x;
     const deltaY = cursor.y - this.y;
+    const ratio = this.width / this.height;
 
     const orientationProps: Record<string, () => Coords> = {
       "top-left": () => ({
@@ -360,7 +365,61 @@ export class Handler extends State {
       }),
     };
 
-    const props = orientationProps[this.orientation]();
+    const orientationPropsConstrained: Record<string, () => Coords> = {
+      "top-left": () => ({
+        x: this.x + deltaY * ratio,
+        y: cursor.y,
+        width: this.width - deltaY * ratio,
+        height: this.height - deltaY,
+      }),
+      "top-right": () => ({
+        x: this.x,
+        y: this.y + deltaY,
+        width: this.width - deltaY * ratio,
+        height: this.height - deltaY,
+      }),
+      "bottom-left": () => ({
+        x: cursor.x,
+        y: this.y,
+        width: this.width - deltaX,
+        height: ((this.width - deltaX) * 1) / ratio,
+      }),
+      "bottom-right": () => ({
+        x: this.x,
+        y: this.y,
+        width: deltaX,
+        height: (deltaX * 1) / ratio,
+      }),
+      "top-middle": () => ({
+        x: this.x,
+        y: this.y + deltaY,
+        width: this.width - deltaY * ratio,
+        height: this.height - deltaY,
+      }),
+      "bottom-middle": () => ({
+        x: this.x,
+        y: this.y,
+        width: deltaY * ratio,
+        height: deltaY,
+      }),
+      "middle-left": () => ({
+        x: cursor.x,
+        y: this.y,
+        width: this.width - deltaX,
+        height: ((this.width - deltaX) * 1) / ratio,
+      }),
+      "middle-right": () => ({
+        x: this.x,
+        y: this.y,
+        width: deltaX,
+        height: (deltaX * 1) / ratio,
+      }),
+    };
+
+    const props = (
+      this.preserveAspectRatio ? orientationPropsConstrained : orientationProps
+    )[this.orientation]();
+
     setElementProps(this.id, props);
   };
 }
@@ -406,7 +465,7 @@ export class Shape extends State {
     setStartCoords({ x: e.clientX, y: e.clientY });
     setFocusedComponentId(target.id);
 
-    const { x, y } = getElementProps(this.id)!;
+    const { x, y } = getElementProps(this.id)!.props;
     const startPoint = mouseToSvgCoords(e);
 
     this.deltaX = startPoint.x - x;

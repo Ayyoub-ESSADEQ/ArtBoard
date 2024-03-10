@@ -1,6 +1,6 @@
 import { SVGProps, memo } from "react";
 
-const DrawingBoard = memo((props: SVGProps<SVGSVGElement>) => {
+export const DrawingBoard = memo((props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

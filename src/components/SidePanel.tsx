@@ -1,8 +1,6 @@
 import { memo } from "react";
 import useStore from "../state/store";
-import { EmptyCommentSection } from "./icons/EmptyCommentSection";
-import { RightPanelCollapse } from "./icons/RightPanelCollapse";
-import { Send } from "./icons/Send";
+import * as Icons from "./icons/Icons";
 
 export const SidePanel = memo(() => {
   const { isCommentSectionToggeled, setCommentSectionToToggled } = useStore();
@@ -19,11 +17,11 @@ export const SidePanel = memo(() => {
             onClick={() => setCommentSectionToToggled(false)}
             className="rounded-md hover:cursor-pointer hover:bg-gray-100 h-7 aspect-square flex items-center justify-center"
           >
-            <RightPanelCollapse />
+            <Icons.RightPanelCollapse />
           </div>
         </div>
         <div className="w-full text-gray-600 flex-grow flex flex-col items-center gap-2 justify-center">
-          <EmptyCommentSection className="w-[200px] h-[200px] " />
+          <Icons.EmptyCommentSection className="w-[200px] h-[200px] " />
           <div className="w-48 text-center">
             Lead the Discussion! Be the First to Comment.
           </div>
@@ -35,7 +33,7 @@ export const SidePanel = memo(() => {
             data-placeholder="write a comment.."
           ></div>
           <div className="absolute flex justify-center items-center h-6 w-6 rounded-md bottom-3 right-4 hover:bg-gray-300">
-            <Send />
+            <Icons.Send />
           </div>
         </div>
       </div>

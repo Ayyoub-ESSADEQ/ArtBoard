@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { create } from "zustand";
+import yeah from '../assets/9562781_yeah_rock and roll_cool_rock_done_icon.min.svg'
 
 export const Tool = {
   Rectangle: "cross-hair",
@@ -12,16 +13,48 @@ export const Tool = {
   Pan: "grab",
 };
 
-interface Shape {
-  height: number;
-  width: number;
-  type: string;
-  fill: string;
-  id: string;
+interface ShapeBase {
   x: number;
   y: number;
-  href?: string;
+  width: number;
+  height: number;
 }
+
+interface OtherShapeProps extends ShapeBase {
+  href: string;
+}
+
+interface ShapeProps extends ShapeBase {
+  fill: string;
+}
+
+interface TextProps extends ShapeBase {
+  format: "bold" | "italic" | "normal";
+  fontSize: number;
+  color: string;
+}
+
+type Shape =
+  | {
+      id: string;
+      type: "text";
+      props: TextProps;
+    }
+  | {
+      id: string;
+      type: "shape";
+      props: OtherShapeProps;
+    }
+  | {
+      id: string;
+      type: "circle";
+      props: ShapeProps;
+    }
+  | {
+      id: string;
+      type: "rectangle";
+      props: ShapeProps;
+    };
 
 type ShapeEditorState =
   | {
@@ -63,61 +96,85 @@ export interface BearState {
   // setCollaboratorCursor: (shapeEditor: ShapeEditorState) => void;
 }
 
-const INITIAL_DRAWING = [
+const INITIAL_DRAWING: Shape[] = [
   {
     id: nanoid(6),
-    type: "rect",
-    x: 100,
-    y: 100,
-    width: 1,
-    height: 1,
-    fill: "blue",
+    type: "rectangle",
+    props: {
+      x: 100,
+      y: 100,
+      width: 1,
+      height: 1,
+      fill: "blue",
+    },
   },
   {
     id: nanoid(6),
-    type: "hexagonal",
-    x: 100,
-    y: 100,
-    width: 200,
-    height: 200,
-    fill: "blue",
+    type: "shape",
+    props: {
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 200,
+      href: "https://cdn.dribbble.com/userupload/13481011/file/original-bef44b9b571f8611f52002612f26be3d.png?resize=400x300&vertical=center",
+    },
   },
   {
     id: nanoid(6),
-    type: "rect",
-    x: 200,
-    y: 400,
-    width: 200,
-    height: 300,
-    fill: "red",
+    type: "rectangle",
+    props: {
+      x: 200,
+      y: 400,
+      width: 200,
+      height: 300,
+      fill: "red",
+    },
   },
   {
     id: nanoid(6),
-    type: "image",
-    x: 800,
-    y: 500,
-    width: 200,
-    height: 300,
-    fill: "red",
-    href: "https://cdn.dribbble.com/userupload/13308142/file/still-02a795b0bd22783893f7f5167eb8b0b3.png?resize=400x300&vertical=center",
+    type: "shape",
+    props: {
+      x: 800,
+      y: 500,
+      width: 200,
+      height: 300,
+      href: "https://cdn.dribbble.com/userupload/13308142/file/still-02a795b0bd22783893f7f5167eb8b0b3.png?resize=400x300&vertical=center",
+    },
   },
   {
     id: nanoid(6),
     type: "circle",
-    x: 900,
-    y: 400,
-    width: 200,
-    height: 300,
-    fill: "yellow",
+    props: {
+      x: 900,
+      y: 400,
+      width: 200,
+      height: 300,
+      fill: "yellow",
+    },
   },
   {
     id: nanoid(6),
     type: "text",
-    x: 900,
-    y: 400,
-    width: 200,
-    height: 300,
-    fill: "yellow",
+    props: {
+      x: 900,
+      y: 400,
+      width: 200,
+      height: 300,
+      color: "black",
+      format: "normal",
+      fontSize: 12,
+    },
+  },
+  {
+    id: nanoid(6),
+    type: "shape",
+    props: {
+      x: 100,
+      y: 100,
+      width: 1,
+      height: 1,
+      href: yeah,
+    },
   },
 ];
 
@@ -173,7 +230,10 @@ const useStore = create<BearState>()((set, get) => ({
       const index = board.findIndex((shape) => shape.id === id);
       if (index === -1) return state;
 
-      board[index] = { ...board[index], ...props };
+      board[index] = {
+        ...board[index],
+        props: { ...board[index].props, ...props },
+      } as Shape;
       return { ...state, shapeEditor: { show: false }, board: board };
     });
   },

@@ -1,0 +1,256 @@
+.prefix__st2,
+.prefix__st3,
+.prefix__st5,
+.prefix__st6,
+.prefix__st7,
+.prefix__st8 {
+  fill: #22093a;
+  stroke: #22093a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.prefix__st3,
+.prefix__st5,
+.prefix__st6,
+.prefix__st7,
+.prefix__st8 {
+  fill: #fcc707;
+}
+
+.prefix__st5,
+.prefix__st6,
+.prefix__st7,
+.prefix__st8 {
+  fill: #fd32b0;
+}
+
+.prefix__st6,
+.prefix__st7,
+.prefix__st8 {
+  fill: none;
+  stroke: #fff;
+}
+
+.prefix__st7,
+.prefix__st8 {
+  fill: #9736ff;
+  stroke: #22093a;
+}
+
+.prefix__st8 {
+  fill: none;
+  stroke: #d9bbff;
+}
+
+html,
+body {
+  overscroll-behavior-x: none;
+}
+.AlmostDone {
+  .prefix__st2,
+  .prefix__st3,
+  .prefix__st4,
+  .prefix__st6,
+  .prefix__st8,
+  .prefix__st9 {
+    fill: #22093a;
+    stroke: #22093a;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .prefix__st3,
+  .prefix__st4,
+  .prefix__st6,
+  .prefix__st8,
+  .prefix__st9 {
+    fill: #35ccad;
+  }
+
+  .prefix__st4,
+  .prefix__st6,
+  .prefix__st8,
+  .prefix__st9 {
+    fill: none;
+    stroke: #fff;
+  }
+
+  .prefix__st6,
+  .prefix__st8,
+  .prefix__st9 {
+    fill: #fff;
+    stroke: #22093a;
+  }
+
+  .prefix__st8,
+  .prefix__st9 {
+    fill: #9736ff;
+  }
+
+  .prefix__st9 {
+    fill: none;
+    stroke: #c295fc;
+  }
+}
+
+.OK {
+  .prefix__st2,
+  .prefix__st4,
+  .prefix__st5,
+  .prefix__st6 {
+    fill: #22093a;
+    stroke: #22093a;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .prefix__st4,
+  .prefix__st5,
+  .prefix__st6 {
+    fill: none;
+  }
+
+  .prefix__st5,
+  .prefix__st6 {
+    stroke: #fff;
+  }
+
+  .prefix__st6 {
+    fill: #35ccad;
+    stroke: #22093a;
+  }
+}
+
+.Thanks {
+  .prefix__st2,
+  .prefix__st4,
+  .prefix__st5,
+  .prefix__st6,
+  .prefix__st7,
+  .prefix__st8 {
+    fill: #22093a;
+    stroke: #22093a;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .prefix__st4,
+  .prefix__st5,
+  .prefix__st6,
+  .prefix__st7,
+  .prefix__st8 {
+    fill: #9736ff;
+  }
+
+  .prefix__st5,
+  .prefix__st6,
+  .prefix__st7,
+  .prefix__st8 {
+    fill: #fff;
+  }
+
+  .prefix__st6,
+  .prefix__st7,
+  .prefix__st8 {
+    fill: #f1f2f2;
+  }
+
+  .prefix__st7,
+  .prefix__st8 {
+    fill: none;
+    stroke: #fff;
+  }
+
+  .prefix__st8 {
+    stroke: #22093a;
+  }
+}
+
+.Nope {
+  .prefix__st2,
+  .prefix__st4,
+  .prefix__st5 {
+    fill: #22093a;
+    stroke: #22093a;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .prefix__st4,
+  .prefix__st5 {
+    fill: #35ccad;
+  }
+
+  .prefix__st5 {
+    fill: none;
+    stroke: #fff;
+  }
+}
+
+.Star {
+  .prefix__st2,
+  .prefix__st3,
+  .prefix__st4 {
+    fill: #22093a;
+    stroke: #22093a;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .prefix__st3,
+  .prefix__st4 {
+    fill: #fcc707;
+  }
+
+  .prefix__st4 {
+    fill: none;
+  }
+
+  .prefix__st5 {
+    fill: #ff897d;
+  }
+
+  .prefix__st6 {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.Buzy {
+  .prefix__st2,
+  .prefix__st3,
+  .prefix__st4,
+  .prefix__st5,
+  .prefix__st8 {
+    fill: #22093a;
+    stroke: #22093a;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .prefix__st3,
+  .prefix__st4,
+  .prefix__st5,
+  .prefix__st8 {
+    fill: #71c1f2;
+  }
+
+  .prefix__st4,
+  .prefix__st5,
+  .prefix__st8 {
+    fill: none;
+    stroke: #fff;
+  }
+
+  .prefix__st5,
+  .prefix__st8 {
+    stroke: #22093a;
+  }
+
+  .prefix__st8 {
+    fill: #35ccad;
+  }
+}
