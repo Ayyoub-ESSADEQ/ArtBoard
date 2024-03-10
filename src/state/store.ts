@@ -72,7 +72,6 @@ export interface BearState {
   toolInUseName: keyof typeof Tool;
   focusedComponentId: string;
   board: Shape[];
-  backgroundPosition: Coords;
   isDragging: boolean;
   isCommentSectionToggeled: boolean;
   startCoords: Coords;
@@ -85,7 +84,6 @@ export interface BearState {
   setStartCoords: (startCoords: Coords) => void;
   setDragging: (draggingState: boolean) => void;
   setCommentSectionToToggled: (isToggled: boolean) => void;
-  setBackgroundPosition: (backgroundPosition: Coords) => void;
   setFocusedComponentId: (id: string) => void;
   getElementProps: (id: string) => Shape | undefined;
   setElementProps: (id: string, props: object) => void;
@@ -184,7 +182,6 @@ const useStore = create<BearState>()((set, get) => ({
   toolInUseName: "Select",
   isCommentSectionToggeled: false,
   focusedComponentId: "",
-  backgroundPosition: { x: 0, y: 0 },
   scale: 1,
   startCoords: { x: 0, y: 0 },
   isDragging: false,
@@ -209,12 +206,6 @@ const useStore = create<BearState>()((set, get) => ({
 
   setStartCoords: ({ x, y }) =>
     set((state) => ({ ...state, startCoords: { x: x, y: y } })),
-
-  setBackgroundPosition({ x, y }) {
-    set((state) => {
-      return { ...state, backgroundPosition: { x: x, y: y } };
-    });
-  },
 
   setDragging(isDrag) {
     set((state) => ({ ...state, isDragging: isDrag }));

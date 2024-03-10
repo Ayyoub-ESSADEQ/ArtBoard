@@ -97,10 +97,8 @@ export class Whiteboard extends State {
     if (!Whiteboard.whiteboardReference?.current || !e.ctrlKey) return;
 
     const {
-      backgroundPosition,
       viewBox,
       scale,
-      setBackgroundPosition,
       setViewBox,
       setScale,
     } = useStore.getState();
@@ -123,25 +121,14 @@ export class Whiteboard extends State {
       width: viewBox.width * SCALING_FACTOR,
       height: viewBox.height * SCALING_FACTOR,
     });
-
-    setBackgroundPosition({
-      x:
-        e.clientX +
-        (1 / (42 * SCALING_FACTOR)) * (e.clientX + backgroundPosition.x),
-      y:
-        e.clientY +
-        (1 / (42 * SCALING_FACTOR)) * (e.clientY + backgroundPosition.y),
-    });
   };
 
   private handleScrollHorizontally = (e: WheelEvent<SVGSVGElement>) => {
     if (!e.shiftKey) return;
 
     const {
-      backgroundPosition,
       viewBox,
       scale,
-      setBackgroundPosition,
       setViewBox,
     } = useStore.getState();
 
@@ -151,20 +138,13 @@ export class Whiteboard extends State {
       x: viewBox.x + e.deltaY * scale,
       y: viewBox.y,
     });
-
-    setBackgroundPosition({
-      x: backgroundPosition.x - e.deltaY,
-      y: backgroundPosition.y,
-    });
   };
 
   private handleScrollVertically = (e: WheelEvent<SVGSVGElement>) => {
     if (e.shiftKey || e.ctrlKey) return;
     const {
-      backgroundPosition,
       viewBox,
       scale,
-      setBackgroundPosition,
       setViewBox,
     } = useStore.getState();
 
@@ -174,16 +154,12 @@ export class Whiteboard extends State {
       x: viewBox.x + e.deltaX * scale,
       y: viewBox.y + e.deltaY * scale,
     });
-
-    setBackgroundPosition({
-      x: backgroundPosition.x - e.deltaX,
-      y: backgroundPosition.y - e.deltaY,
-    });
   };
 
   public handleMouseWheel = (e: WheelEvent<SVGSVGElement>) => {
     const { setShapeEditor } = useStore.getState();
     setShapeEditor({ show: false });
+    console.log(e.deltaX, e.deltaY)
     this.handleZoom(e);
     this.handleScrollHorizontally(e);
     this.handleScrollVertically(e);
@@ -193,12 +169,10 @@ export class Whiteboard extends State {
     const {
       scale,
       viewBox,
-      backgroundPosition,
       startCoords,
       isDragging,
       toolInUseName,
       setViewBox,
-      setBackgroundPosition,
       setWhiteboardCursor,
       setStartCoords,
     } = useStore.getState();
@@ -209,11 +183,6 @@ export class Whiteboard extends State {
 
     const deltaX = e.clientX - startCoords.x;
     const deltaY = e.clientY - startCoords.y;
-
-    setBackgroundPosition({
-      x: backgroundPosition.x + deltaX,
-      y: backgroundPosition.y + deltaY,
-    });
 
     setViewBox({
       width: viewBox.width,
