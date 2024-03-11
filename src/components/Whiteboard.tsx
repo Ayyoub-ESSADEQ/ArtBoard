@@ -8,20 +8,20 @@ import { Circle } from "./Shapes/Circle";
 
 import useStore from "../state/store";
 import Resizer from "./Resizer";
-import MouseEventContext, { Whiteboard } from "../utils/MouseEventContext";
 import BackgroundGrid from "./BackgroundGrid";
+import { Whiteboard } from "../utils/MouseStrategy";
+import { handleMouseDown } from "../utils/ManageWhiteboardStrategies";
 
 // import useWebsocket from "../hooks/useWebsocket";
 
 const SketchBoard = memo(() => {
   const whiteboardRef = useRef<SVGSVGElement>(null);
-  const whiteboard = useRef(new MouseEventContext(new Whiteboard()));
-  const { board, viewBox, whiteboardCursor } = useStore();
+  const { board, viewBox, whiteboardCursor, context } = useStore();
 
   useFullScreen(whiteboardRef);
   usePreventBrowserZoom();
   useEffect(() => {
-    Whiteboard.whiteboardReference = whiteboardRef;
+    Whiteboard.whiteboardReference = whiteboardRef.current;
   });
 
   useEffect(() => {
@@ -37,10 +37,10 @@ const SketchBoard = memo(() => {
       id="whiteboard"
       ref={whiteboardRef}
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-      onMouseDown={whiteboard.current.handleMouseDown}
-      onMouseMove={whiteboard.current.handleMouseMove}
-      onMouseUp={whiteboard.current.handleMouseUp}
-      onWheel={whiteboard.current.handleMouseWheel}
+      onMouseDown={handleMouseDown}
+      onMouseMove={context.handleMouseMove}
+      onMouseUp={context.handleMouseUp}
+      onWheel={context.handleMouseWheel}
       onContextMenu={(e) => e.preventDefault()}
       className="absolute top-0 left-0 overflow-hidden"
       data-type="whiteboard"

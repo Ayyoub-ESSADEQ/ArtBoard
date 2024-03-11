@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
 import { create } from "zustand";
-import yeah from '../assets/9562781_yeah_rock and roll_cool_rock_done_icon.min.svg'
+import yeah from "../assets/9562781_yeah_rock and roll_cool_rock_done_icon.min.svg";
+import { Context, Whiteboard } from "../utils/MouseStrategy";
 
 export const Tool = {
   Rectangle: "cross-hair",
@@ -78,6 +79,7 @@ export interface BearState {
   viewBox: ViewBox;
   whiteboardCursor: string;
   scale: number;
+  context: Context;
   // collaboratorCursorPosition: Coords | undefined;
   setScale: (factor: number) => void;
   setViewBox: (viewbox: ViewBox) => void;
@@ -177,6 +179,7 @@ const INITIAL_DRAWING: Shape[] = [
 ];
 
 const useStore = create<BearState>()((set, get) => ({
+  context: new Context(new Whiteboard()),
   shapeEditor: { show: false },
   whiteboardCursor: "arrow",
   toolInUseName: "Select",
