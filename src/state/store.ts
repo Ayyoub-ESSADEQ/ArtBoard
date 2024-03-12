@@ -27,6 +27,8 @@ interface OtherShapeProps extends ShapeBase {
 
 interface ShapeProps extends ShapeBase {
   fill: string;
+  stroke?: string;
+  strokeWidth?: number;
 }
 
 interface TextProps extends ShapeBase {
@@ -35,7 +37,7 @@ interface TextProps extends ShapeBase {
   color: string;
 }
 
-type Shape =
+export type Shape =
   | {
       id: string;
       type: "text";

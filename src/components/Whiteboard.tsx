@@ -43,7 +43,6 @@ const SketchBoard = memo(() => {
       onWheel={context.handleMouseWheel}
       onContextMenu={(e) => e.preventDefault()}
       className="absolute top-0 left-0 overflow-hidden"
-      data-type="whiteboard"
     >
       <BackgroundGrid />
       <g>
@@ -52,7 +51,7 @@ const SketchBoard = memo(() => {
             case "rectangle":
               return (
                 <Resizer key={id}>
-                  <Rectangle {...props} key={id} id={id} rx="15" />
+                  <Rectangle {...props} key={id} id={id} rx="8" />
                 </Resizer>
               );
 

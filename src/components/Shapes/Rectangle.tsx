@@ -5,5 +5,5 @@ interface RectangleProps extends React.SVGProps<SVGRectElement> {
 }
 
 export const Rectangle = memo((props: RectangleProps) => {
-  return <rect {...props}/>;
+  return <rect {...props} />;
 });

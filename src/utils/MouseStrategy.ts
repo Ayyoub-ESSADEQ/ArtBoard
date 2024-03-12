@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MouseEvent, WheelEvent } from "react";
-import useStore from "../state/store";
+import useStore, { Shape as ShapeProps } from "../state/store";
+import { nanoid } from "nanoid";
 
-interface Coords {
+interface Position {
   x: number;
   y: number;
+}
+
+interface Coords extends Position {
   width: number;
   height: number;
 }
@@ -72,7 +76,7 @@ abstract class Strategy {
     this.handleScrollVertically(e);
   };
 
-  public mouseToSvgCoords = (e: React.MouseEvent<unknown>) => {
+  public mouseToSvgCoords = (e: React.MouseEvent<SVGSVGElement>) => {
     const svg = Whiteboard.whiteboardReference;
     const point = new DOMPoint();
 
@@ -117,21 +121,16 @@ export class Context {
 
 export class Whiteboard extends Strategy {
   static whiteboardReference?: SVGSVGElement | null;
+  private isDragging = false;
+  private startCoords!: Position;
 
   public handleMouseMove = (e: MouseEvent<any>): void => {
-    const {
-      scale,
-      viewBox,
-      startCoords,
-      isDragging,
-      setViewBox,
-      setStartCoords,
-    } = useStore.getState();
+    const { scale, viewBox, setViewBox } = useStore.getState();
 
-    if (!isDragging) return;
+    if (!this.isDragging) return;
 
-    const deltaX = e.clientX - startCoords.x;
-    const deltaY = e.clientY - startCoords.y;
+    const deltaX = e.clientX - this.startCoords.x;
+    const deltaY = e.clientY - this.startCoords.y;
 
     setViewBox({
       width: viewBox.width,
@@ -140,19 +139,20 @@ export class Whiteboard extends Strategy {
       y: viewBox.y - deltaY * scale,
     });
 
-    setStartCoords({ x: e.clientX, y: e.clientY });
+    this.startCoords = { x: e.clientX, y: e.clientY };
   };
 
   public handleMouseDown = (e: MouseEvent<any>) => {
-    const { setDragging, setStartCoords, setShapeEditor } = useStore.getState();
-    setDragging(true);
+    const { setShapeEditor } = useStore.getState();
     setShapeEditor({ show: false });
-    setStartCoords({ x: e.clientX, y: e.clientY });
+
+    this.isDragging = true;
+    this.startCoords = { x: e.clientX, y: e.clientY };
   };
 
   public handleMouseUp() {
-    const { setDragging, setShapeEditor } = useStore.getState();
-    setDragging(false);
+    const { setShapeEditor } = useStore.getState();
+    this.isDragging = false;
     setShapeEditor({ show: false });
   }
 }
@@ -163,13 +163,14 @@ export class Handler extends Strategy {
   private id!: string;
   private width!: number;
   private height!: number;
+  private isDragging = false;
   private orientation!: string;
   private preserveAspectRatio = false;
 
   public handleMouseDown = (e: MouseEvent<any>) => {
     const target = e.target as HTMLElement;
 
-    const { setDragging, getElementProps } = useStore.getState();
+    const { getElementProps } = useStore.getState();
 
     this.id = target.id;
 
@@ -182,23 +183,59 @@ export class Handler extends Strategy {
     this.width = width;
     this.height = height;
     this.orientation = target.dataset.orientation!;
-    setDragging(true);
+    this.isDragging = true;
   };
 
   public handleMouseUp = () => {
-    const { setDragging, setShapeEditor } = useStore.getState();
-    setDragging(false);
+    const { setShapeEditor } = useStore.getState();
+    this.isDragging = false;
     setShapeEditor({ show: false });
   };
 
   public handleMouseMove = (e: MouseEvent<any>): void => {
-    const { isDragging, setElementProps } = useStore.getState();
-    if (!isDragging) return;
+    const { setElementProps } = useStore.getState();
+    if (!this.isDragging) return;
 
     const cursor = this.mouseToSvgCoords(e);
     const deltaX = cursor.x - this.x;
     const deltaY = cursor.y - this.y;
     const ratio = this.width / this.height;
+    const limit = 25;
+
+    const orientationPropsRef: Record<string, () => Position> = {
+      "top-left": () => ({
+        x: this.width - limit + this.x,
+        y: this.height - limit + this.y,
+      }),
+      "top-right": () => ({
+        x: this.x,
+        y: this.height - limit + this.y,
+      }),
+      "bottom-left": () => ({
+        x: this.width - limit + this.x,
+        y: this.y,
+      }),
+      "bottom-right": () => ({
+        x: this.x,
+        y: this.y,
+      }),
+      "top-middle": () => ({
+        x: this.x,
+        y: this.height - limit + this.y,
+      }),
+      "bottom-middle": () => ({
+        x: this.x,
+        y: this.y,
+      }),
+      "middle-left": () => ({
+        x: this.width - limit + this.x,
+        y: this.y,
+      }),
+      "middle-right": () => ({
+        x: this.x,
+        y: this.y,
+      }),
+    };
 
     const orientationProps: Record<string, () => Coords> = {
       "top-left": () => ({
@@ -209,12 +246,12 @@ export class Handler extends Strategy {
       }),
       "top-right": () => ({
         x: this.x,
-        y: this.y + deltaY,
+        y: cursor.y,
         width: deltaX,
         height: this.height - deltaY,
       }),
       "bottom-left": () => ({
-        x: this.x + deltaX,
+        x: cursor.x,
         y: this.y,
         width: this.width - deltaX,
         height: deltaY,
@@ -306,6 +343,18 @@ export class Handler extends Strategy {
       this.preserveAspectRatio ? orientationPropsConstrained : orientationProps
     )[this.orientation]();
 
+    const propsRef = orientationPropsRef[this.orientation]();
+
+    if (props.width < limit) {
+      props.width = limit;
+      props.x = propsRef.x;
+    }
+
+    if (props.height < limit) {
+      props.height = this.preserveAspectRatio ? limit / ratio : limit;
+      props.y = propsRef.y;
+    }
+
     setElementProps(this.id, props);
   };
 }
@@ -314,21 +363,16 @@ export class Shape extends Strategy {
   private id!: string;
   private deltaX = 0;
   private deltaY = 0;
+  private isDragging = false;
 
   public handleMouseDown = (e: MouseEvent<any>) => {
     const target = e.target as HTMLElement;
 
-    const {
-      setDragging,
-      setStartCoords,
-      getElementProps,
-      setFocusedComponentId,
-    } = useStore.getState();
+    const { getElementProps, setFocusedComponentId } = useStore.getState();
 
     this.id = target.id;
+    this.isDragging = true;
 
-    setDragging(true);
-    setStartCoords({ x: e.clientX, y: e.clientY });
     setFocusedComponentId(target.id);
 
     const { x, y } = getElementProps(this.id)!.props;
@@ -339,14 +383,13 @@ export class Shape extends Strategy {
   };
 
   public handleMouseUp = () => {
-    const { setDragging } = useStore.getState();
-    setDragging(false);
+    this.isDragging = false;
   };
 
   public handleMouseMove = (e: MouseEvent<any>): void => {
-    const { isDragging, setElementProps, setShapeEditor } = useStore.getState();
+    const { setElementProps, setShapeEditor } = useStore.getState();
 
-    if (!isDragging) return;
+    if (!this.isDragging) return;
 
     const startPoint = this.mouseToSvgCoords(e);
 
@@ -355,5 +398,57 @@ export class Shape extends Strategy {
       x: startPoint.x - this.deltaX,
       y: startPoint.y - this.deltaY,
     });
+  };
+}
+
+export class Draw extends Strategy {
+  private id = nanoid(6);
+  private topLeftCorner!: Position;
+  private bottomRightCorner!: Position;
+  private isDragging = false;
+
+  public handleMouseDown = (e: MouseEvent<any>) => {
+    const { setShapeEditor, addBoardElement } = useStore.getState();
+    this.isDragging = true;
+    setShapeEditor({ show: false });
+
+    const startPoint = this.mouseToSvgCoords(e);
+
+    this.topLeftCorner = { x: startPoint.x, y: startPoint.y };
+    this.bottomRightCorner = this.topLeftCorner;
+
+    const rectangle: ShapeProps = {
+      id: this.id,
+      type: "rectangle",
+      props: {
+        x: startPoint.x,
+        y: startPoint.y,
+        width: 0,
+        height: 0,
+        fill: "orange",
+      },
+    };
+
+    addBoardElement(rectangle);
+  };
+
+  public handleMouseMove = (e: MouseEvent<any>) => {
+    const { setElementProps } = useStore.getState();
+    if (!this.isDragging) return;
+
+    const endPoint = this.mouseToSvgCoords(e);
+
+    this.topLeftCorner = { x: endPoint.x, y: endPoint.y };
+
+    setElementProps(this.id, {
+      width: Math.max(this.topLeftCorner.x - this.bottomRightCorner.x, 25),
+      height: Math.max(this.topLeftCorner.y - this.bottomRightCorner.y, 25),
+    });
+  };
+
+  public handleMouseUp = () => {
+    const { setToolInUseName } = useStore.getState();
+    this.isDragging = false;
+    setToolInUseName("Select");
   };
 }

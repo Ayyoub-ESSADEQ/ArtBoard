@@ -3,37 +3,45 @@ import {
   Whiteboard,
   Shape as ShapeStrategy,
   Handler,
+  Draw,
 } from "../utils/MouseStrategy";
 
-//I need to create a flow diagram so that I will manage the flow state of 
+//I need to create a flow diagram so that I will manage the flow state of
 //our tools
 
 export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
   const type = (e.target as HTMLElement).dataset.type;
-  const { context, toolInUseName } = useStore.getState();
+  const { context, toolInUseName, setFocusedComponentId, setShapeEditor } =
+    useStore.getState();
 
-  switch (type) {
-    case "whiteboard":
-      if (toolInUseName !== "Pan") return;
+  switch (toolInUseName) {
+    case "Pan":
+      setFocusedComponentId("whiteboard");
       context.setStrategy(new Whiteboard());
       context.handleMouseDown(e);
       break;
 
-    case "shape":
-      if (toolInUseName === "Pan") {
-        context.setStrategy(new Whiteboard());
-        context.handleMouseDown(e);
+    case "Select":
+      switch (type) {
+        case "shape":
+          context.setStrategy(new ShapeStrategy());
+          context.handleMouseDown(e);
+          break;
+
+        case "handler":
+          context.setStrategy(new Handler());
+          context.handleMouseDown(e);
+          break;
+
+        case "whiteboard":
+          setFocusedComponentId("whiteboard");
+          setShapeEditor({ show: false });
+          break;
       }
-
-      if (toolInUseName !== "Select") return;
-
-      context.setStrategy(new ShapeStrategy());
-      context.handleMouseDown(e);
       break;
 
-    case "handler":
-      if (toolInUseName !== "Select") return;
-      context.setStrategy(new Handler());
+    case "Rectangle":
+      context.setStrategy(new Draw());
       context.handleMouseDown(e);
       break;
   }

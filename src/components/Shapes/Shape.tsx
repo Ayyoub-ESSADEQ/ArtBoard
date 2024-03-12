@@ -1,5 +1,6 @@
 import { memo } from "react";
 import useStore from "../../state/store";
+import { Rectangle } from "./Rectangle";
 
 interface ShapeProps extends React.SVGProps<SVGImageElement> {
   id: string;
@@ -35,7 +36,7 @@ export const Shape = memo((props: ShapeProps) => {
         </pattern>
       </defs>
 
-      <rect
+      <Rectangle
         x={props.x}
         y={props.y}
         id={props.id}
