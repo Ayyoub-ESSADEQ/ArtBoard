@@ -1,17 +1,15 @@
-import { nanoid } from "nanoid";
-import { create } from "zustand";
-import yeah from "../assets/9562781_yeah_rock and roll_cool_rock_done_icon.min.svg";
-import { Context, Whiteboard } from "../utils/MouseStrategy";
+import { create, StoreApi, UseBoundStore } from "zustand";
+import { Context, Shape as ShapeContext } from "../utils/MouseStrategy";
 
 export const Tool = {
-  Rectangle: "cross-hair",
-  Sticker: "default",
-  Circle: "cross-hair",
-  Select: "default",
-  Arrow: "default",
-  Image: "default",
+  Rectangle: "cursor-draw",
+  Sticker: "cursor-select",
+  Circle: "cursor-draw",
+  Select: "cursor-select",
+  Arrow: "cursor-draw",
+  Image: "cursor-select",
   Text: "text",
-  Pan: "grab",
+  Pan: "cursor-grab",
 };
 
 interface ShapeBase {
@@ -70,6 +68,23 @@ type ShapeEditorState =
 type ViewBox = { x: number; y: number; width: number; height: number };
 type Coords = { x: number; y: number };
 
+type WithSelectors<S> = S extends { getState: () => infer T }
+  ? S & { use: { [K in keyof T]: () => T[K] } }
+  : never;
+
+const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(
+  _store: S
+) => {
+  const store = _store as WithSelectors<typeof _store>;
+  store.use = {};
+  for (const k of Object.keys(store.getState())) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (store.use as any)[k] = () => store((s) => s[k as keyof typeof s]);
+  }
+
+  return store;
+};
+
 export interface BearState {
   shapeEditor: ShapeEditorState;
   toolInUseName: keyof typeof Tool;
@@ -83,6 +98,7 @@ export interface BearState {
   scale: number;
   context: Context;
   // collaboratorCursorPosition: Coords | undefined;
+  setBoard: (board: Shape[]) => void;
   setScale: (factor: number) => void;
   setViewBox: (viewbox: ViewBox) => void;
   setStartCoords: (startCoords: Coords) => void;
@@ -98,126 +114,40 @@ export interface BearState {
   // setCollaboratorCursor: (shapeEditor: ShapeEditorState) => void;
 }
 
-const INITIAL_DRAWING: Shape[] = [
-  {
-    id: nanoid(6),
-    type: "rectangle",
-    props: {
-      x: 100,
-      y: 100,
-      width: 1,
-      height: 1,
-      fill: "blue",
-    },
-  },
-  {
-    id: nanoid(6),
-    type: "shape",
-    props: {
-      x: 100,
-      y: 100,
-      width: 200,
-      height: 200,
-      href: "https://cdn.dribbble.com/userupload/13481011/file/original-bef44b9b571f8611f52002612f26be3d.png?resize=400x300&vertical=center",
-    },
-  },
-  {
-    id: nanoid(6),
-    type: "rectangle",
-    props: {
-      x: 200,
-      y: 400,
-      width: 200,
-      height: 300,
-      fill: "red",
-    },
-  },
-  {
-    id: nanoid(6),
-    type: "shape",
-    props: {
-      x: 800,
-      y: 500,
-      width: 200,
-      height: 300,
-      href: "https://cdn.dribbble.com/userupload/13308142/file/still-02a795b0bd22783893f7f5167eb8b0b3.png?resize=400x300&vertical=center",
-    },
-  },
-  {
-    id: nanoid(6),
-    type: "circle",
-    props: {
-      x: 900,
-      y: 400,
-      width: 200,
-      height: 300,
-      fill: "yellow",
-    },
-  },
-  {
-    id: nanoid(6),
-    type: "text",
-    props: {
-      x: 900,
-      y: 400,
-      width: 200,
-      height: 300,
-      color: "black",
-      format: "normal",
-      fontSize: 12,
-    },
-  },
-  {
-    id: nanoid(6),
-    type: "shape",
-    props: {
-      x: 100,
-      y: 100,
-      width: 1,
-      height: 1,
-      href: yeah,
-    },
-  },
-];
-
-const useStore = create<BearState>()((set, get) => ({
-  context: new Context(new Whiteboard()),
+const useStoreBase = create<BearState>()((set, get) => ({
+  context: new Context(new ShapeContext()),
   shapeEditor: { show: false },
-  whiteboardCursor: "arrow",
+  whiteboardCursor: "cursor-select",
   toolInUseName: "Select",
   isCommentSectionToggeled: false,
   focusedComponentId: "",
   scale: 1,
   startCoords: { x: 0, y: 0 },
   isDragging: false,
-  board: INITIAL_DRAWING,
+  board: [],
   viewBox: { x: 0, y: 0, width: screen.availWidth, height: screen.availHeight },
   setScale(factor) {
-    set((state) => ({ ...state, scale: factor }));
+    set(() => ({ scale: factor }));
   },
   setViewBox({ x, y, width, height }) {
-    set((state) => {
-      return {
-        ...state,
-        viewBox: {
-          x: x,
-          y: y,
-          width: width,
-          height: height,
-        },
-      };
-    });
+    set(() => ({
+      viewBox: {
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+      },
+    }));
   },
 
-  setStartCoords: ({ x, y }) =>
-    set((state) => ({ ...state, startCoords: { x: x, y: y } })),
+  setStartCoords: ({ x, y }) => set(() => ({ startCoords: { x: x, y: y } })),
 
   setDragging(isDrag) {
-    set((state) => ({ ...state, isDragging: isDrag }));
+    set(() => ({ isDragging: isDrag }));
   },
 
-  getElementProps: (id) => {
-    return get().board.find((shape) => shape.id === id);
+  getElementProps: (shapeId) => {
+    return get().board.find(({ id }) => id === shapeId);
   },
 
   setElementProps(id, props) {
@@ -230,33 +160,39 @@ const useStore = create<BearState>()((set, get) => ({
         ...board[index],
         props: { ...board[index].props, ...props },
       } as Shape;
-      return { ...state, shapeEditor: { show: false }, board: board };
+      return { shapeEditor: { show: false }, board: board };
     });
   },
 
   setFocusedComponentId(id) {
-    set((state) => ({ ...state, focusedComponentId: id }));
+    set(() => ({ focusedComponentId: id }));
   },
 
   setCommentSectionToToggled(isToggled) {
-    set((state) => ({ ...state, isCommentSectionToggeled: isToggled }));
+    set(() => ({ isCommentSectionToggeled: isToggled }));
   },
 
   setWhiteboardCursor(cursor) {
-    set((state) => ({ ...state, whiteboardCursor: cursor }));
+    set(() => ({ whiteboardCursor: cursor }));
   },
 
   setToolInUseName(toolName) {
-    set((state) => ({ ...state, toolInUseName: toolName }));
+    set(() => ({ toolInUseName: toolName }));
   },
 
   setShapeEditor(shapeEditor) {
-    set((state) => ({ ...state, shapeEditor: shapeEditor }));
+    set(() => ({ shapeEditor: shapeEditor }));
   },
 
   addBoardElement(element: Shape) {
-    set((state) => ({ ...state, board: [...get().board, element] }));
+    set(() => ({ board: [...get().board, element] }));
+  },
+
+  setBoard(board) {
+    set(() => ({ board: board }));
   },
 }));
+
+const useStore = createSelectors(useStoreBase);
 
 export default useStore;

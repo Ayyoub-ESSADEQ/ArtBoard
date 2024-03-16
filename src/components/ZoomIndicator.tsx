@@ -1,6 +1,6 @@
 import { memo } from "react";
 import useStore from "../state/store";
-import { Whiteboard } from "../utils/MouseEventContext";
+import { Whiteboard } from "../utils/MouseStrategy";
 import { Minus } from "./icons/Minus";
 import { Plus } from "./icons/Plus";
 
@@ -18,7 +18,7 @@ const ZoomIndicator = memo(() => {
   const toPercentage = (n: number) => Math.round(n * 100) + "%";
 
   const zoom = (zoomFactor: number) => {
-    const svg = Whiteboard.whiteboardReference?.current;
+    const svg = Whiteboard.whiteboardReference;
     const point = new DOMPoint();
 
     point.x = screen.availWidth / 2;

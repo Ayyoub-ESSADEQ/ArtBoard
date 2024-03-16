@@ -2,23 +2,22 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Whiteboards } from "./routes/whiteboards.tsx";
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Route,
-  createRoutesFromElements,
-} from "react-router-dom";
+import { loader as whiteboardsLoader } from "./App.tsx";
 
-const Greeting = () => <h1 className="z-50 fixed left-0 top-0">Hello world</h1>;
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<App />}>
-      <Route path="contact" element={<Greeting />} />
-    </Route>
-  )
-);
+const router = createBrowserRouter([
+  {
+    path: "/whiteboards",
+    element: <Whiteboards />,
+  },
+  {
+    path: "whiteboards/:whiteboardId",
+    loader: whiteboardsLoader,
+    element: <App />,
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

@@ -3,15 +3,14 @@ import {
   Whiteboard,
   Shape as ShapeStrategy,
   Handler,
-  Draw,
+  DrawRectangle,
+  DrawCircle,
 } from "../utils/MouseStrategy";
 
-//I need to create a flow diagram so that I will manage the flow state of
-//our tools
 
 export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
   const type = (e.target as HTMLElement).dataset.type;
-  const { context, toolInUseName, setFocusedComponentId, setShapeEditor } =
+  const { context, toolInUseName, setFocusedComponentId, setShapeEditor} =
     useStore.getState();
 
   switch (toolInUseName) {
@@ -41,7 +40,12 @@ export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
       break;
 
     case "Rectangle":
-      context.setStrategy(new Draw());
+      context.setStrategy(new DrawRectangle());
+      context.handleMouseDown(e);
+      break;
+
+    case "Circle":
+      context.setStrategy(new DrawCircle());
       context.handleMouseDown(e);
       break;
   }

@@ -42,14 +42,15 @@ const FileUpload = () => {
       );
 
       addBoardElement({
-        type: "image",
-        x: 0,
-        width: 0,
-        height: 0,
-        y: 0,
-        fill: "",
+        type: "shape",
         id: nanoid(6),
-        href: response.data?.href,
+        props: {
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          href: response.data?.href,
+        },
       });
 
       setIsUploaded(true);

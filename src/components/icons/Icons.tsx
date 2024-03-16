@@ -18,3 +18,6 @@ export { Send } from "./Send";
 
 export { Messages } from "./Messages";
 export { Bold, Italic, ColorPallete } from "./TextFormat";
+export { Folder } from "./Folder";
+export { Star } from "./Star";
+export { FilledStar } from "./FilledStar";

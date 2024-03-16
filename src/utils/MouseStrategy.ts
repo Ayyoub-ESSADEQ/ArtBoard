@@ -125,7 +125,8 @@ export class Whiteboard extends Strategy {
   private startCoords!: Position;
 
   public handleMouseMove = (e: MouseEvent<any>): void => {
-    const { scale, viewBox, setViewBox } = useStore.getState();
+    const { scale, viewBox, setViewBox, setWhiteboardCursor } =
+      useStore.getState();
 
     if (!this.isDragging) return;
 
@@ -139,6 +140,8 @@ export class Whiteboard extends Strategy {
       y: viewBox.y - deltaY * scale,
     });
 
+    setWhiteboardCursor("cursor-grabbing");
+
     this.startCoords = { x: e.clientX, y: e.clientY };
   };
 
@@ -151,9 +154,10 @@ export class Whiteboard extends Strategy {
   };
 
   public handleMouseUp() {
-    const { setShapeEditor } = useStore.getState();
+    const { setShapeEditor, setWhiteboardCursor } = useStore.getState();
     this.isDragging = false;
     setShapeEditor({ show: false });
+    setWhiteboardCursor("cursor-grab");
   }
 }
 
@@ -187,9 +191,10 @@ export class Handler extends Strategy {
   };
 
   public handleMouseUp = () => {
-    const { setShapeEditor } = useStore.getState();
+    const { setShapeEditor, setWhiteboardCursor } = useStore.getState();
     this.isDragging = false;
     setShapeEditor({ show: false });
+    setWhiteboardCursor("cursor-select");
   };
 
   public handleMouseMove = (e: MouseEvent<any>): void => {
@@ -368,12 +373,14 @@ export class Shape extends Strategy {
   public handleMouseDown = (e: MouseEvent<any>) => {
     const target = e.target as HTMLElement;
 
-    const { getElementProps, setFocusedComponentId } = useStore.getState();
+    const { getElementProps, setFocusedComponentId, setWhiteboardCursor } =
+      useStore.getState();
 
     this.id = target.id;
     this.isDragging = true;
 
     setFocusedComponentId(target.id);
+    setWhiteboardCursor("cursor-select");
 
     const { x, y } = getElementProps(this.id)!.props;
     const startPoint = this.mouseToSvgCoords(e);
@@ -401,14 +408,15 @@ export class Shape extends Strategy {
   };
 }
 
-export class Draw extends Strategy {
+export class DrawRectangle extends Strategy {
   private id = nanoid(6);
   private topLeftCorner!: Position;
   private bottomRightCorner!: Position;
   private isDragging = false;
 
   public handleMouseDown = (e: MouseEvent<any>) => {
-    const { setShapeEditor, addBoardElement } = useStore.getState();
+    const { setShapeEditor, addBoardElement, setFocusedComponentId } =
+      useStore.getState();
     this.isDragging = true;
     setShapeEditor({ show: false });
 
@@ -430,6 +438,7 @@ export class Draw extends Strategy {
     };
 
     addBoardElement(rectangle);
+    setFocusedComponentId(this.id);
   };
 
   public handleMouseMove = (e: MouseEvent<any>) => {
@@ -447,8 +456,125 @@ export class Draw extends Strategy {
   };
 
   public handleMouseUp = () => {
-    const { setToolInUseName } = useStore.getState();
     this.isDragging = false;
+    const { setToolInUseName, setWhiteboardCursor } = useStore.getState();
     setToolInUseName("Select");
+    setWhiteboardCursor("cursor-select");
+  };
+}
+
+export class DrawCircle extends Strategy {
+  private id = nanoid(6);
+  private topLeftCorner!: Position;
+  private bottomRightCorner!: Position;
+  private isDragging = false;
+
+  public handleMouseDown = (e: MouseEvent<any>) => {
+    const { setShapeEditor, addBoardElement, setFocusedComponentId } =
+      useStore.getState();
+    this.isDragging = true;
+    setShapeEditor({ show: false });
+
+    const startPoint = this.mouseToSvgCoords(e);
+
+    this.topLeftCorner = { x: startPoint.x, y: startPoint.y };
+    this.bottomRightCorner = this.topLeftCorner;
+
+    const rectangle: ShapeProps = {
+      id: this.id,
+      type: "circle",
+      props: {
+        x: startPoint.x,
+        y: startPoint.y,
+        width: 0,
+        height: 0,
+        fill: "orange",
+      },
+    };
+
+    addBoardElement(rectangle);
+    setFocusedComponentId(this.id);
+  };
+
+  public handleMouseMove = (e: MouseEvent<any>) => {
+    if (!this.isDragging) return;
+
+    const { setElementProps } = useStore.getState();
+    const endPoint = this.mouseToSvgCoords(e);
+
+    this.topLeftCorner = { x: endPoint.x, y: endPoint.y };
+
+    setElementProps(this.id, {
+      width: Math.max(this.topLeftCorner.x - this.bottomRightCorner.x, 25),
+      height: Math.max(this.topLeftCorner.y - this.bottomRightCorner.y, 25),
+    });
+  };
+
+  public handleMouseUp = () => {
+    this.isDragging = false;
+    const { setToolInUseName, setWhiteboardCursor } = useStore.getState();
+    setToolInUseName("Select");
+    setWhiteboardCursor("cursor-select");
+  };
+}
+
+export class DrawCustomShape extends Strategy {
+  private id = nanoid(6);
+  private topLeftCorner!: Position;
+  private bottomRightCorner!: Position;
+  private isDragging = false;
+  private href: string;
+
+  constructor(href: string) {
+    super();
+    this.href = href;
+  }
+
+  public handleMouseDown = (e: MouseEvent<any>) => {
+    const { setShapeEditor, addBoardElement, setFocusedComponentId } =
+      useStore.getState();
+    this.isDragging = true;
+    setShapeEditor({ show: false });
+
+    const startPoint = this.mouseToSvgCoords(e);
+
+    this.topLeftCorner = { x: startPoint.x, y: startPoint.y };
+    this.bottomRightCorner = this.topLeftCorner;
+
+    const rectangle: ShapeProps = {
+      id: this.id,
+      type: "shape",
+      props: {
+        x: startPoint.x,
+        y: startPoint.y,
+        width: 0,
+        height: 0,
+        href: this.href,
+      },
+    };
+
+    addBoardElement(rectangle);
+    setFocusedComponentId(this.id);
+  };
+
+  public handleMouseMove = (e: MouseEvent<any>) => {
+    if (!this.isDragging) return;
+    const { setElementProps } = useStore.getState();
+
+    const endPoint = this.mouseToSvgCoords(e);
+
+    this.topLeftCorner = { x: endPoint.x, y: endPoint.y };
+
+    setElementProps(this.id, {
+      width: Math.max(this.topLeftCorner.x - this.bottomRightCorner.x, 25),
+      height: Math.max(this.topLeftCorner.y - this.bottomRightCorner.y, 25),
+    });
+  };
+
+  public handleMouseUp = () => {
+    this.isDragging = false;
+    const { setToolInUseName, setWhiteboardCursor } = useStore.getState();
+    setToolInUseName("Select");
+    setWhiteboardCursor("cursor-select");
   };
 }

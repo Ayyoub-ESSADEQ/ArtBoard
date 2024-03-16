@@ -3,6 +3,8 @@ import { HTMLProps, memo } from "react";
 import FileUpload from "./Shapes/FileUpload";
 import * as Icons from "./icons/Icons";
 import * as Stickers from "./stickers/stickers";
+import axios from "axios";
+import UpdateObserver from "../utils/UpdateObserver";
 
 interface ToolProps extends HTMLProps<HTMLDivElement> {
   functionality: keyof typeof Tool;
@@ -93,7 +95,16 @@ const ToolBox = memo(() => {
       <ToolItem functionality={"Pan"}>
         <Icons.Drag />
       </ToolItem>
-      <ToolItem functionality={"Arrow"}>
+      <ToolItem
+        functionality={"Arrow"}
+        onClick={async () => {
+          const observer = UpdateObserver.getInstance();
+          observer.notify({ id: "" });
+          await axios.put(`http://localhost:3000${window.location.pathname}`, {
+            name: "Ayyoub Essadeq",
+          });
+        }}
+      >
         <Icons.Arrow />
       </ToolItem>
       <ToolItem functionality={"Select"}>
