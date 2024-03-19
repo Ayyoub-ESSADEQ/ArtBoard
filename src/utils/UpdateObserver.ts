@@ -17,7 +17,11 @@ export default class UpdateObserver {
     this.url = url;
   };
 
-  notify = (data: Partial<Shape>) => {
+  public getUrl() {
+    return this.url;
+  }
+
+  public notify = (data: Partial<Shape>) => {
     if (!this.url) return;
     console.log("I get notified");
     console.log(this.url);

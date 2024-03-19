@@ -21,7 +21,6 @@ export async function loader({ params }: any): Promise<Data> {
     const response = await axios.get(url);
     const observer = UpdateObserver.getInstance();
     observer.setUrl(url);
-    console.log(response.data);
     return { whiteboards: response.data };
   } catch (e) {
     return { whiteboards: { content: [] } };

@@ -7,12 +7,16 @@ import { Whiteboard } from "../utils/MouseStrategy";
 import BackgroundGrid from "./BackgroundGrid";
 import SketchBoard from "./SketchBoard";
 import useStore from "../state/store";
+import useWebsocket from "../hooks/useWebsocket";
 
 const Board = memo(() => {
   const whiteboardRef = useRef<SVGSVGElement>(null);
   const { viewBox, whiteboardCursor, context } = useStore();
+  
   useFullScreen(whiteboardRef);
   usePreventBrowserZoom();
+  useWebsocket(whiteboardRef);
+
   useEffect(() => {
     Whiteboard.whiteboardReference = whiteboardRef.current;
   });

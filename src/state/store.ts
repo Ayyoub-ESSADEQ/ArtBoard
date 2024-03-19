@@ -12,6 +12,13 @@ export const Tool = {
   Pan: "cursor-grab",
 };
 
+export interface CollaboratorCursorPosition {
+  x: number;
+  y: number;
+  userId: string;
+  username: string;
+}
+
 interface ShapeBase {
   x: number;
   y: number;
@@ -90,19 +97,15 @@ export interface BearState {
   toolInUseName: keyof typeof Tool;
   focusedComponentId: string;
   board: Shape[];
-  isDragging: boolean;
   isCommentSectionToggeled: boolean;
-  startCoords: Coords;
   viewBox: ViewBox;
   whiteboardCursor: string;
   scale: number;
   context: Context;
-  // collaboratorCursorPosition: Coords | undefined;
+  collaborators: CollaboratorCursorPosition[];
   setBoard: (board: Shape[]) => void;
   setScale: (factor: number) => void;
   setViewBox: (viewbox: ViewBox) => void;
-  setStartCoords: (startCoords: Coords) => void;
-  setDragging: (draggingState: boolean) => void;
   setCommentSectionToToggled: (isToggled: boolean) => void;
   setFocusedComponentId: (id: string) => void;
   getElementProps: (id: string) => Shape | undefined;
@@ -111,7 +114,12 @@ export interface BearState {
   setToolInUseName: (toolName: keyof typeof Tool) => void;
   setShapeEditor: (shapeEditor: ShapeEditorState) => void;
   addBoardElement: (element: Shape) => void;
-  // setCollaboratorCursor: (shapeEditor: ShapeEditorState) => void;
+
+  //Those are the sate action related to collaboration
+  updateCollaboratorCursor: (userId: string, props: Coords) => void;
+  addCollaborator: (collaborator: CollaboratorCursorPosition) => void;
+  setCollaborators: (collaborators: CollaboratorCursorPosition[]) => void;
+  removeCollaboratorCursor: (userId: string) => void;
 }
 
 const useStoreBase = create<BearState>()((set, get) => ({
@@ -122,9 +130,8 @@ const useStoreBase = create<BearState>()((set, get) => ({
   isCommentSectionToggeled: false,
   focusedComponentId: "",
   scale: 1,
-  startCoords: { x: 0, y: 0 },
-  isDragging: false,
   board: [],
+  collaborators: [],
   viewBox: { x: 0, y: 0, width: screen.availWidth, height: screen.availHeight },
   setScale(factor) {
     set(() => ({ scale: factor }));
@@ -138,12 +145,6 @@ const useStoreBase = create<BearState>()((set, get) => ({
         height: height,
       },
     }));
-  },
-
-  setStartCoords: ({ x, y }) => set(() => ({ startCoords: { x: x, y: y } })),
-
-  setDragging(isDrag) {
-    set(() => ({ isDragging: isDrag }));
   },
 
   getElementProps: (shapeId) => {
@@ -190,6 +191,42 @@ const useStoreBase = create<BearState>()((set, get) => ({
 
   setBoard(board) {
     set(() => ({ board: board }));
+  },
+
+  updateCollaboratorCursor(id, props) {
+    set((state) => {
+      const collaborators = [...state.collaborators];
+      const index = collaborators.findIndex(({ userId }) => userId === id);
+      collaborators[index] = {
+        ...collaborators[index],
+        x: props.x,
+        y: props.y,
+      };
+      return { ...state, collaborators: collaborators };
+    });
+  },
+
+  addCollaborator(collaborator) {
+    set((state) => ({
+      ...state,
+      collaborators: [...get().collaborators, collaborator],
+    }));
+  },
+
+  setCollaborators(collaborators) {
+    set((state) => ({ ...state, collaborators: collaborators }));
+  },
+
+  removeCollaboratorCursor(collaboratorId) {
+    set((state) => {
+      const collaborators = [...state.collaborators];
+      const index = collaborators.findIndex(
+        ({ userId }) => userId === collaboratorId
+      );
+
+      collaborators.splice(index, 1);
+      return { ...state, collaborators: collaborators };
+    });
   },
 }));
 
