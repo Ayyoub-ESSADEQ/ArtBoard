@@ -165,6 +165,7 @@ export class Handler extends Strategy {
   private x!: number;
   private y!: number;
   private id!: string;
+  private type!: string;
   private width!: number;
   private height!: number;
   private isDragging = false;
@@ -180,6 +181,7 @@ export class Handler extends Strategy {
 
     const { type, props } = getElementProps(this.id)!;
     const { x, y, width, height } = props;
+    this.type = type;
     this.preserveAspectRatio = type == "shape";
 
     this.x = x;
@@ -360,6 +362,16 @@ export class Handler extends Strategy {
       props.y = propsRef.y;
     }
 
+    //This is necessary because we also change the height from the text component
+    //if we don't use this we will have the height changed from two places which
+    //create as result an unconsitency trough out the app
+    //if we find better way to remove this will be good because handler will be more general
+    //and we will not be ought to treat specific cases.
+
+    if (this.type === "text") {
+      ///@ts-expect-error : because the height is not an optional property in the props type
+      delete props.height;
+    }
     setElementProps(this.id, props);
   };
 }
@@ -390,7 +402,9 @@ export class Shape extends Strategy {
   };
 
   public handleMouseUp = () => {
+    const { setWhiteboardCursor } = useStore.getState();
     this.isDragging = false;
+    setWhiteboardCursor("cursor-select");
   };
 
   public handleMouseMove = (e: MouseEvent<any>): void => {
@@ -576,5 +590,41 @@ export class DrawCustomShape extends Strategy {
     const { setToolInUseName, setWhiteboardCursor } = useStore.getState();
     setToolInUseName("Select");
     setWhiteboardCursor("cursor-select");
+  };
+}
+
+export class Text extends Strategy {
+  private id = nanoid(6);
+
+  public handleMouseUp(): void {
+    //TO-DO: implement this
+  }
+  public handleMouseMove(): void {
+    //TO-DO: implement this
+  }
+
+  public handleMouseDown = (e: MouseEvent<any>) => {
+    const { setShapeEditor, addBoardElement, setFocusedComponentId } =
+      useStore.getState();
+
+    setShapeEditor({ show: false });
+
+    const cursor = this.mouseToSvgCoords(e);
+
+    const text: ShapeProps = {
+      id: this.id,
+      type: "text",
+      props: {
+        x: cursor.x,
+        y: cursor.y,
+        focus: true,
+        width: 135,
+        height: 0,
+        content: "",
+      },
+    };
+
+    addBoardElement(text);
+    setFocusedComponentId(this.id);
   };
 }

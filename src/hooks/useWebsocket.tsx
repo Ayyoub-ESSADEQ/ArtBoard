@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { io } from "socket.io-client";
 import mouseToSvgCoords from "../utils/mouseToSvgCoords";
 import useStore from "../state/store";
+import { SocketSingleton } from "../utils/socketSingleton";
 
 export default function useWebsocket(ref: React.RefObject<SVGSVGElement>) {
   const {
@@ -9,10 +10,13 @@ export default function useWebsocket(ref: React.RefObject<SVGSVGElement>) {
     setCollaborators,
     addCollaborator,
     removeCollaboratorCursor,
+    setElementProps,
+    addBoardElement,
   } = useStore();
 
   useEffect(() => {
     const socket = io("http://localhost:3000");
+    SocketSingleton.init(socket);
 
     socket.on("connect", () => {
       if (!ref.current) return;
@@ -27,9 +31,11 @@ export default function useWebsocket(ref: React.RefObject<SVGSVGElement>) {
       });
     });
 
+    socket.on("users", (data) => setCollaborators(data));
+
     socket.on("collaboartor_move_cursor", ({ x, y, userId }) => {
-      const {scale} = useStore.getState();
-      updateCollaboratorCursor(userId, { x: x/scale, y: y/scale });
+      const { scale } = useStore.getState();
+      updateCollaboratorCursor(userId, { x: x / scale, y: y / scale });
     });
 
     socket.on("collaborator_disconnected", ({ userId }) =>
@@ -38,7 +44,13 @@ export default function useWebsocket(ref: React.RefObject<SVGSVGElement>) {
 
     socket.on("new_collaborator_join", (data) => addCollaborator(data));
 
-    socket.on("users", (data) => setCollaborators(data));
+    socket.on("collaborator_update_element", ({ id, props }) => {
+      setElementProps(id, props, true);
+    });
+
+    socket.on("collaborator_add_element", ({ element }) => {
+      addBoardElement(element, true);
+    });
 
     return () => {
       socket.disconnect();

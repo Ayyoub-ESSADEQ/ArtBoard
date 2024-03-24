@@ -5,13 +5,18 @@ import {
   Handler,
   DrawRectangle,
   DrawCircle,
+  Text,
 } from "../utils/MouseStrategy";
-
 
 export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
   const type = (e.target as HTMLElement).dataset.type;
-  const { context, toolInUseName, setFocusedComponentId, setShapeEditor} =
-    useStore.getState();
+  const {
+    context,
+    toolInUseName,
+    setFocusedComponentId,
+    setWhiteboardCursor,
+    setShapeEditor,
+  } = useStore.getState();
 
   switch (toolInUseName) {
     case "Pan":
@@ -42,6 +47,12 @@ export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
     case "Rectangle":
       context.setStrategy(new DrawRectangle());
       context.handleMouseDown(e);
+      break;
+
+    case "Text":
+      context.setStrategy(new Text());
+      context.handleMouseDown(e);
+      setWhiteboardCursor("cursor-draw");
       break;
 
     case "Circle":

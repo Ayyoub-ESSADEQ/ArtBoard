@@ -5,8 +5,8 @@ import { Text } from "./Shapes/Text";
 import { Circle } from "./Shapes/Circle";
 
 import useStore from "../state/store";
-import Resizer from "./Resizer";
 import Collaboration from "./Collaboration";
+import Resizer from "./Resizer";
 
 const SketchBoard = memo(() => {
   const { board } = useStore();
@@ -17,37 +17,24 @@ const SketchBoard = memo(() => {
         {board.map(({ id, type, props }) => {
           switch (type) {
             case "rectangle":
-              return (
-                <Resizer key={id}>
-                  <Rectangle {...props} key={id} id={id} rx="8" />
-                </Resizer>
-              );
+              return <Rectangle {...props} key={id} id={id} rx="8" />;
 
             case "circle":
-              return (
-                <Resizer key={id}>
-                  <Circle key={id} id={id} {...props} />
-                </Resizer>
-              );
+              return <Circle key={id} id={id} {...props} />;
 
             case "text":
-              return (
-                <Resizer key={id}>
-                  <Text key={id} id={id} {...props} />
-                </Resizer>
-              );
+              return <Text key={id} id={id} {...props} />;
 
             case "shape":
-              return (
-                <Resizer key={id}>
-                  <Shape key={id} id={id} {...props} />
-                </Resizer>
-              );
+              return <Shape key={id} id={id} {...props} />;
 
             default:
               return <></>;
           }
         })}
+      </g>
+      <g>
+        <Resizer />
       </g>
       <Collaboration />
     </>

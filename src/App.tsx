@@ -1,7 +1,7 @@
 import Header from "./components/Header";
 import Whiteboard from "./components/Board";
 import ToolBox from "./components/ToolBox";
-import { SidePanel } from "./components/SidePanel";
+import { CommentSection } from "./components/CommentSection";
 import Overlay from "./components/Overlay";
 import ZoomIndicator from "./components/ZoomIndicator";
 import { useLoaderData } from "react-router-dom";
@@ -40,7 +40,7 @@ function App() {
       <Overlay></Overlay>
       <Whiteboard></Whiteboard>
       <Header></Header>
-      <SidePanel />
+      <CommentSection />
       <ToolBox />
       <ZoomIndicator />
     </div>

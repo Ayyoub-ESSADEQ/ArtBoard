@@ -1,5 +1,6 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
 import { Context, Shape as ShapeContext } from "../utils/MouseStrategy";
+import { SocketSingleton } from "../utils/socketSingleton";
 
 export const Tool = {
   Rectangle: "cursor-draw",
@@ -37,9 +38,10 @@ interface ShapeProps extends ShapeBase {
 }
 
 interface TextProps extends ShapeBase {
-  format: "bold" | "italic" | "normal";
-  fontSize: number;
-  color: string;
+  content: string;
+  format?: "bold" | "italic" | "normal";
+  fontSize?: number;
+  color?: string;
 }
 
 export type Shape =
@@ -109,11 +111,26 @@ export interface BearState {
   setCommentSectionToToggled: (isToggled: boolean) => void;
   setFocusedComponentId: (id: string) => void;
   getElementProps: (id: string) => Shape | undefined;
-  setElementProps: (id: string, props: object) => void;
+
+  /**
+   *
+   * @param id
+   * @param props
+   * @param modifiedByOtherMember means that the new set of properties are comming from
+   * other memebers, let's say that another member changes the size of a rectangle, in that
+   * case we have to update the properties of the element without notifying the other members
+   * so that we don't be in an infinite loop.
+   * @returns
+   */
+  setElementProps: (
+    id: string,
+    props: object,
+    modifiedByOtherMember?: boolean
+  ) => void;
   setWhiteboardCursor: (cursor: string) => void;
   setToolInUseName: (toolName: keyof typeof Tool) => void;
   setShapeEditor: (shapeEditor: ShapeEditorState) => void;
-  addBoardElement: (element: Shape) => void;
+  addBoardElement: (element: Shape, addedByOther?: boolean) => void;
 
   //Those are the sate action related to collaboration
   updateCollaboratorCursor: (userId: string, props: Coords) => void;
@@ -151,11 +168,18 @@ const useStoreBase = create<BearState>()((set, get) => ({
     return get().board.find(({ id }) => id === shapeId);
   },
 
-  setElementProps(id, props) {
+  setElementProps(id, props, modifiedByOtherMember) {
     set((state) => {
       const board = [...state.board];
       const index = board.findIndex((shape) => shape.id === id);
       if (index === -1) return state;
+
+      if (!modifiedByOtherMember) {
+        const socketSingleton = SocketSingleton.getInstance();
+        socketSingleton
+          .getSocket()
+          ?.emit("update_element", { id: id, props: props });
+      }
 
       board[index] = {
         ...board[index],
@@ -185,7 +209,12 @@ const useStoreBase = create<BearState>()((set, get) => ({
     set(() => ({ shapeEditor: shapeEditor }));
   },
 
-  addBoardElement(element: Shape) {
+  addBoardElement(element: Shape, addedByOther) {
+    if (!addedByOther) {
+      const socketSingleton = SocketSingleton.getInstance();
+      socketSingleton.getSocket()?.emit("add_element", { element: element });
+    }
+
     set(() => ({ board: [...get().board, element] }));
   },
 
@@ -231,5 +260,4 @@ const useStoreBase = create<BearState>()((set, get) => ({
 }));
 
 const useStore = createSelectors(useStoreBase);
-
 export default useStore;

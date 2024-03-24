@@ -40,7 +40,6 @@ export const Shape = memo((props: ShapeProps) => {
         x={props.x}
         y={props.y}
         id={props.id}
-        // key={props.key}
         width={props.width}
         height={props.height}
         fill={`url(#${props.id})`}

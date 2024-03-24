@@ -2,7 +2,7 @@ import { memo } from "react";
 import useStore from "../state/store";
 import * as Icons from "./icons/Icons";
 
-export const SidePanel = memo(() => {
+export const CommentSection = memo(() => {
   const { isCommentSectionToggeled, setCommentSectionToToggled } = useStore();
   const visibility = isCommentSectionToggeled ? "block" : "hidden";
 
