@@ -33,5 +33,5 @@ export function usePreventBrowserZoom() {
       document.removeEventListener("keydown", preventZoomShortcuts);
       document.removeEventListener("wheel", preventZoomWheel);
     };
-  });
+  }, []);
 }

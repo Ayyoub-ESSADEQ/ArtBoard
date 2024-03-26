@@ -1,27 +1,13 @@
-import {
-  ReactComponentElement,
-  SVGProps,
-  createContext,
-  memo,
-  useContext,
-} from "react";
+import { SVGProps, createContext, memo, useContext } from "react";
 import useStore from "../state/store";
-import Rectangle from "./Shapes/Rectangle";
 
-type Element = "div" | "svg" | "rect" | "circle";
+type Horizontal = "left" | "right";
+type Vertical = "top" | "bottom";
+
 type Orientation =
-  | "top-left"
-  | "top-middle"
-  | "top-right"
-  | "middle-left"
-  | "middle-right"
-  | "bottom-left"
-  | "bottom-right"
-  | "bottom-middle";
-
-interface ResizerProps {
-  children: ReactComponentElement<Element>;
-}
+  | `${Vertical}-${Horizontal}`
+  | `middle-${Horizontal}`
+  | `${Vertical}-middle`;
 
 interface ResizeHandlerProps extends SVGProps<SVGRectElement> {
   orientation: Orientation;
@@ -30,15 +16,22 @@ interface ResizeHandlerProps extends SVGProps<SVGRectElement> {
 interface ResizableFrameProps {
   width: number;
   height: number;
+  id: string;
   x: number;
   y: number;
 }
 
-const idContext = createContext("");
+const idContext = createContext<ResizableFrameProps>({
+  width: 0,
+  height: 0,
+  x: 0,
+  y: 0,
+  id: "",
+});
 
-const ResizeHandler = memo((props: ResizeHandlerProps) => {
+export const ResizeHandler = memo((props: ResizeHandlerProps) => {
   const corner = 8;
-  const id = useContext(idContext);
+  const { id } = useContext(idContext);
   const { scale } = useStore();
   return (
     <rect
@@ -60,8 +53,10 @@ const ResizeHandler = memo((props: ResizeHandlerProps) => {
   );
 });
 
-const ResizeHandlers = memo(
-  ({ width, height }: { width: number; height: number }) => (
+const ResizeHandlers = memo(() => {
+  const { width, height } = useContext(idContext);
+
+  return (
     <>
       <ResizeHandler
         className="hover:cursor-nw-resize"
@@ -106,43 +101,70 @@ const ResizeHandlers = memo(
         orientation="bottom-right"
       />
     </>
-  )
-);
+  );
+});
 
-const ResizableFrame = memo(({ width, height, x, y }: ResizableFrameProps) => {
-  const { scale, focusedComponentId } = useStore();
-  const id = useContext(idContext);
+export const ResizableFrame = memo(() => {
+  const { scale } = useStore();
+  const { width, height, x, y } = useContext(idContext);
 
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <Rectangle
+      <rect
         x={0}
         y={0}
         width={width}
         height={height}
-        fill="transparent"
-        strokeWidth={focusedComponentId === id ? 2 * scale : 0}
+        fill="none"
+        strokeWidth={2 * scale}
         className="stroke-blue-500"
-        data-type="shape"
-        id={`${id}`}
       />
-      {focusedComponentId === id ? (
-        <ResizeHandlers width={width} height={height} />
-      ) : (
-        <></>
-      )}
+      <ResizeHandlers />
     </g>
   );
 });
 
-const Resizer = memo((props: Readonly<ResizerProps>) => {
-  const { getElementProps } = useStore((state) => state);
-  const { width, height, x, y } = getElementProps(props.children.key!)!;
+export const ResizableFrameForText = memo(() => {
+  const { scale } = useStore();
+  const { width, height, x, y } = useContext(idContext);
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <rect
+        x={0}
+        y={0}
+        width={width}
+        height={height}
+        fill="none"
+        strokeWidth={2 * scale}
+        className="stroke-blue-500"
+      />
+
+      <ResizeHandler
+        y={height / 2}
+        className="hover:cursor-e-resize"
+        orientation="middle-left"
+      />
+
+      <ResizeHandler
+        x={width}
+        y={height / 2}
+        className="hover:cursor-e-resize"
+        orientation="middle-right"
+      />
+    </g>
+  );
+});
+
+const Resizer = memo(() => {
+  const { getElementProps, focusedComponentId } = useStore();
+  if (!focusedComponentId || focusedComponentId === "whiteboard") return <></>;
+  const { type, props } = getElementProps(focusedComponentId)!;
+
   return (
     <>
-      {props.children}
-      <idContext.Provider value={props.children.key!}>
-        <ResizableFrame width={width} height={height} x={x} y={y} />
+      <idContext.Provider value={{ ...props, id: focusedComponentId }}>
+        {type === "text" ? <ResizableFrameForText /> : <ResizableFrame />}
       </idContext.Provider>
     </>
   );

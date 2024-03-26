@@ -1,17 +1,7 @@
-import { Share } from "./icons/Share";
-import { Messages } from "./icons/Messages";
-import { HTMLProps } from "react";
+import { useState } from "react";
 import useStore from "../state/store";
-
-interface SideProps extends HTMLProps<HTMLDivElement> {}
-
-const Side = (props: SideProps) => {
-  return (
-    <div {...props} className={`${props.className} flex flex-row items-center`}>
-      {props.children}
-    </div>
-  );
-};
+import AssetsPanel from "./AssetPanel";
+import * as Icons from "./Icons";
 
 const Collaborator = () => {
   return (
@@ -21,33 +11,56 @@ const Collaborator = () => {
 
 export default function Header() {
   const { isCommentSectionToggeled, setCommentSectionToToggled } = useStore();
+  const [showAssets, setShowAssets] = useState(false);
+  const visibility = showAssets ? "left-0" : "left-[-325px]";
+
+  const toggleComments = () => {
+    setCommentSectionToToggled(!isCommentSectionToggeled);
+  };
 
   return (
-    <div className="border-b z-50 px-3 box-border shadow-sm flex-grow border-b-gray-200 top-0 flex flex-row items-center justify-between left-0 h-10 bg-white">
-      <Side> </Side>
-      <Side>/📌 Whiteboard Collaboration Project</Side>
-      <Side className="gap-4">
-        <Side
-          onClick={() => {
-            setCommentSectionToToggled(!isCommentSectionToggeled);
-            console.log("Hello world");
-          }}
-          className="w-7 h-7 text-gray-600 justify-center rounded-md hover:cursor-pointer hover:bg-gray-100"
+    <div className="border-b z-50 box-border shadow-sm flex-grow border-b-gray-200 top-0 flex flex-row items-center justify-between left-0 h-11 bg-white">
+      <div className="flex-row-center ropa-sans-regular gap-2">
+        <span
+          onMouseEnter={() => setShowAssets(true)}
+          className="flex-row-center px-1 text-[#293845] border-r-2 h-11 w-11 flex-row-center justify-center"
         >
-          <Messages />
-        </Side>
+          <AssetsPanel
+            className={`${visibility} w-[325px] border-r-2`}
+            onMouseLeave={() => setShowAssets(false)}
+          />
+          <Icons.Assets />
+        </span>
+        <span className="font-bold text-[#788896] px-2 hover:bg-[#edf1f5] hover:cursor-pointer rounded-sm">
+          MY FILES
+        </span>
+        <span className="text-[#c3cfd9]">/</span>
+        <Icons.DrawingBoard className="text-violet-500 h-11" />
+        <span className="text-[#293845] font-medium">
+          Whiteboard Collaboration Project
+        </span>
+      </div>
+      <div className="flex-row-center">
+        <div className="flex-row-center">
+          <Collaborator />
+          <Collaborator />
+          <Collaborator />
+        </div>
 
-        <Side>
-          <Collaborator />
-          <Collaborator />
-          <Collaborator />
-        </Side>
+        <div
+          onClick={toggleComments}
+          className="flex-row-center border-l-2 h-11 w-11 text-gray-600 justify-center hover:cursor-pointer hover:bg-gray-100"
+        >
+          <Icons.Messages />
+        </div>
 
-        <Side className="bg-violet-600 select-none hover:bg-violet-800 hover:cursor-pointer gap-2 w-[80px] h-[30px] box-border justify-center text-[13px] rounded-md px-2 text-white">
-          <Share />
-          <span>Share</span>
-        </Side>
-      </Side>
+        <div className="flex-row-center text-[#293845] border-l-2 h-11 px-2">
+          <div className="flex-row-center rounded-full bg-[#edf1f5] hover:cursor-pointer gap-2 py-1 px-2">
+            <Icons.Share />
+            <span className="ropa-sans-regular-italic">Share</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,5 +7,5 @@ export function useFullScreen(ref: React.RefObject<SVGSVGElement>) {
       ref.current.style.width = `${screen.availWidth}px`;
       ref.current.style.height = `${screen.availHeight}px`;
     }
-  });
+  }, []);
 }
