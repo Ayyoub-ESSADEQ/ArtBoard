@@ -27,9 +27,17 @@ const getCaret = (contentEditableElement: HTMLDivElement) => {
 const setCaret = (contentEditableElement: HTMLDivElement, offset: number) => {
   const sel = window.getSelection();
   if (!sel) return;
+
+  const start = contentEditableElement.childNodes[0];
+
+  if (!start) {
+    contentEditableElement.focus();
+    return;
+  }
+
   const range = document.createRange();
 
-  range.setStart(contentEditableElement.childNodes[0], offset);
+  range.setStart(start, offset);
   range.collapse(true);
   sel.removeAllRanges();
   sel.addRange(range);
@@ -57,13 +65,18 @@ export const Text = memo((props: TextProps) => {
 
   const handleDoubleClick = () => {
     setIsEditMode(true);
-    textTag.current?.focus();
+    setTimeout(() => {
+      if (!textTag.current) return;
+      const content = textTag.current.textContent;
+      setCaret(textTag.current, content ? content.length : 0);
+      textTag.current.focus();
+    }, 0);
   };
 
   useEffect(() => {
     const target = textTag.current;
     if (!target || !props.focus) return;
-    target.focus();
+    setTimeout(() => target.focus(), 0);
   }, []);
 
   //We make sure that we preserve the cursor position
@@ -80,8 +93,11 @@ export const Text = memo((props: TextProps) => {
     setElementProps(props.id!, { height: height * scale });
   }, [props.width]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { ["focus"]: _, ...foreignProps } = props;
+
   return (
-    <foreignObject {...props} focus="">
+    <foreignObject {...foreignProps}>
       <div
         suppressContentEditableWarning={true}
         contentEditable={isEditMode ? "plaintext-only" : false}
@@ -92,7 +108,7 @@ export const Text = memo((props: TextProps) => {
         onInput={handleTextChange}
         onBlur={handleBlur}
         data-placeholder="type text here .."
-        className="border-none text-left z-30 px-2 py-1 whitespace-pre-wrap bg-orange-300 outline-none focus:border-none focus:outline-none bg-transparent placeholder caret-black"
+        className="border-none text-[14px] text-left z-30 px-2 py-1 whitespace-pre-wrap bg-orange-300 outline-none focus:border-none focus:outline-none bg-transparent placeholder caret-black"
       >
         {props.content}
       </div>

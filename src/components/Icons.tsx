@@ -1,0 +1,24 @@
+export { Arrow } from "./icons/Arrow";
+export { Circle } from "./icons/Circle";
+export { Drag } from "./icons/Drag";
+export { Image } from "./icons/Image";
+export { Plus } from "./icons/Plus";
+export { Minus } from "./icons/Minus";
+export { Select } from "./icons/Select";
+export { RightPanelCollapse } from "./icons/RightPanelCollapse";
+export { Sticker } from "./icons/Sticker";
+export { Uploading } from "./icons/Uploading";
+export { Text } from "./icons/Text";
+export { Share } from "./icons/Share";
+export { Assets } from "./icons/Assets";
+export { DrawingBoard } from "./icons/DrawingBoard";
+export { EmptyCommentSection } from "./icons/EmptyCommentSection";
+export { Rectangle } from "./icons/Rectangle";
+export { Send } from "./icons/Send";
+
+export { Messages } from "./icons/Messages";
+export { Bold, Italic, ColorPallete } from "./icons/TextFormat";
+export { Folder } from "./icons/Folder";
+export { Star } from "./icons/Star";
+export { FilledStar } from "./icons/FilledStar";
+export { Search } from "./icons/Search";

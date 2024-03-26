@@ -596,15 +596,11 @@ export class DrawCustomShape extends Strategy {
 export class Text extends Strategy {
   private id = nanoid(6);
 
-  public handleMouseUp(): void {
-    //TO-DO: implement this
-  }
-  public handleMouseMove(): void {
-    //TO-DO: implement this
-  }
+  public handleMouseUp(): void {}
+  public handleMouseMove(): void {}
 
   public handleMouseDown = (e: MouseEvent<any>) => {
-    const { setShapeEditor, addBoardElement, setFocusedComponentId } =
+    const { setShapeEditor, setFocusedComponentId, addBoardElement } =
       useStore.getState();
 
     setShapeEditor({ show: false });
@@ -626,5 +622,44 @@ export class Text extends Strategy {
 
     addBoardElement(text);
     setFocusedComponentId(this.id);
+  };
+}
+
+export class ArrowHandler extends Strategy {
+  private id = nanoid(6);
+  private isDragging = false;
+
+  public handleMouseDown = (e: MouseEvent<any>) => {
+    const { addBoardElement } = useStore.getState();
+    const cursor = this.mouseToSvgCoords(e);
+
+    this.isDragging = true;
+
+    addBoardElement({
+      id: this.id,
+      type: "connector",
+      props: {
+        x1: cursor.x,
+        y1: cursor.y,
+        x2: cursor.x,
+        y2: cursor.y,
+      },
+    });
+  };
+
+  public handleMouseUp = () => {
+    const { setShapeEditor } = useStore.getState();
+    this.isDragging = false;
+    setShapeEditor({ show: false });
+  };
+
+  public handleMouseMove = (e: MouseEvent<any>): void => {
+    if (!this.isDragging) return;
+    const { setElementProps } = useStore.getState();
+    const cursor = this.mouseToSvgCoords(e);
+    setElementProps(this.id, {
+      x2: cursor.x,
+      y2: cursor.y,
+    });
   };
 }

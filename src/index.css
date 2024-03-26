@@ -1,6 +1,8 @@
 /*In the main file where you put all the css*/
 @import "./styles/stickers.style.css";
 @import "./styles/inter.font.css";
+@import "./styles/lato.font.css";
+
 @tailwind base;
 @tailwind utilities;
 

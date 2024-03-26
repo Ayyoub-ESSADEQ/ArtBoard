@@ -1,7 +1,7 @@
 import useStore, { Tool } from "../state/store";
 import { HTMLProps, memo } from "react";
 import FileUpload from "./Shapes/FileUpload";
-import * as Icons from "./icons/Icons";
+import * as Icons from "./Icons";
 import * as Stickers from "./stickers/stickers";
 import axios from "axios";
 import UpdateObserver from "../utils/UpdateObserver";

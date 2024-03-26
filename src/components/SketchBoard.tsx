@@ -7,6 +7,7 @@ import { Circle } from "./Shapes/Circle";
 import useStore from "../state/store";
 import Collaboration from "./Collaboration";
 import Resizer from "./Resizer";
+import Connector from "./Shapes/Connector";
 
 const SketchBoard = memo(() => {
   const { board } = useStore();
@@ -28,12 +29,16 @@ const SketchBoard = memo(() => {
             case "shape":
               return <Shape key={id} id={id} {...props} />;
 
+            case "connector":
+              return <Connector key={id} id={id} {...props} />;
+
             default:
               return <></>;
           }
         })}
       </g>
       <g>
+        <Connector id="something" x1={300} y1={30} x2={200} y2={0} />
         <Resizer />
       </g>
       <Collaboration />

@@ -31,6 +31,13 @@ interface OtherShapeProps extends ShapeBase {
   href: string;
 }
 
+interface ConnectorProps  extends ShapeBase{
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
 interface ShapeProps extends ShapeBase {
   fill: string;
   stroke?: string;
@@ -42,6 +49,11 @@ interface TextProps extends ShapeBase {
   format?: "bold" | "italic" | "normal";
   fontSize?: number;
   color?: string;
+  /**
+   * focus is used to autofocus the text when we create a text using
+   * the text tool from the toobox
+   */
+  focus?: boolean;
 }
 
 export type Shape =
@@ -64,6 +76,11 @@ export type Shape =
       id: string;
       type: "rectangle";
       props: ShapeProps;
+    }
+  | {
+      id: string;
+      type: "connector";
+      props: ConnectorProps;
     };
 
 type ShapeEditorState =

@@ -1,6 +1,6 @@
 import { HTMLProps, memo } from "react";
 import useStore from "../state/store";
-import * as Icons from "./icons/Icons";
+import * as Icons from "./Icons";
 
 const Editor = memo((props: HTMLProps<HTMLDivElement>) => {
   return (

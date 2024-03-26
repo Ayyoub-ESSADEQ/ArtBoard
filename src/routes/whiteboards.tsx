@@ -1,5 +1,5 @@
 import { NavBar } from "../components/Navbar";
-import { DrawingBoard } from "../components/icons/Icons";
+import { DrawingBoard } from "../components/Icons";
 
 const Draft = () => {
   return (

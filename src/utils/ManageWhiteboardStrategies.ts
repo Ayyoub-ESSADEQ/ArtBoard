@@ -6,6 +6,7 @@ import {
   DrawRectangle,
   DrawCircle,
   Text,
+  ArrowHandler,
 } from "../utils/MouseStrategy";
 
 export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -50,9 +51,15 @@ export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
       break;
 
     case "Text":
+      setWhiteboardCursor("cursor-draw");
       context.setStrategy(new Text());
       context.handleMouseDown(e);
+      break;
+
+    case "Arrow":
       setWhiteboardCursor("cursor-draw");
+      context.setStrategy(new ArrowHandler());
+      context.handleMouseDown(e);
       break;
 
     case "Circle":

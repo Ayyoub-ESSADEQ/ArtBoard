@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useStore from "../state/store";
 import AssetsPanel from "./AssetPanel";
-import * as Icons from "./icons/Icons";
+import * as Icons from "./Icons";
 
 const Collaborator = () => {
   return (
