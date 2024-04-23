@@ -1,5 +1,7 @@
 import { DrawingBoard } from "Icons";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, createBrowserRouter, useLoaderData } from "react-router-dom";
+import App, { loader as boardLoader } from "../App.tsx";
+
 import axios from "axios";
 
 interface DraftProps {
@@ -16,7 +18,7 @@ interface Data {
   content: DraftProps[];
 }
 
-export async function loader() {
+async function Whiteboardloader() {
   try {
     const response = await axios.get("http://localhost:3000/whiteboards");
     const data = response.data as Data;
@@ -62,7 +64,7 @@ const Draft = (props: DraftProps) => {
   );
 };
 
-export function Whiteboards() {
+const Whiteboards = () => {
   const { whiteboards } = useLoaderData() as WhiteboardMetaData;
 
   return (
@@ -89,4 +91,17 @@ export function Whiteboards() {
       </div>
     </div>
   );
-}
+};
+
+export const router = createBrowserRouter([
+  {
+    path: "/whiteboards",
+    loader: Whiteboardloader,
+    element: <Whiteboards />,
+  },
+  {
+    path: "whiteboards/:whiteboardId",
+    loader: boardLoader,
+    element: <App />,
+  },
+]);
