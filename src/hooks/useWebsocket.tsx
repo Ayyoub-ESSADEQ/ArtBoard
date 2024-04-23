@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
-import mouseToSvgCoords from "../utils/mouseToSvgCoords";
-import useStore from "../state/store";
-import { SocketSingleton } from "../utils/socketSingleton";
+import {mouseToSvgCoords} from "Utils";
+import useStore from "Store";
+import { SocketSingleton } from "Utils";
 
-export default function useWebsocket(ref: React.RefObject<SVGSVGElement>) {
+export function useWebsocket(ref: React.RefObject<SVGSVGElement>) {
   const {
     updateCollaboratorCursor,
     setCollaborators,

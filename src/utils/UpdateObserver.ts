@@ -1,8 +1,9 @@
-import { Shape } from "../state/store";
+import { Shape } from "Store";
 
-export default class UpdateObserver {
+export class UpdateObserver {
   private static instance: UpdateObserver;
   private url?: string;
+  private whiteboardId?: string;
 
   private constructor() {}
 
@@ -16,6 +17,14 @@ export default class UpdateObserver {
   public setUrl = (url: string) => {
     this.url = url;
   };
+
+  public setWhiteboardId(id: string) {
+    this.whiteboardId = id;
+  }
+
+  public getWhiteboardId() {
+    return this.whiteboardId;
+  }
 
   public getUrl() {
     return this.url;

@@ -1,5 +1,5 @@
 import { SVGProps, createContext, memo, useContext } from "react";
-import useStore from "../state/store";
+import useStore from "Store";
 
 type Horizontal = "left" | "right";
 type Vertical = "top" | "bottom";
@@ -156,7 +156,7 @@ export const ResizableFrameForText = memo(() => {
   );
 });
 
-const Resizer = memo(() => {
+export const Resizer = memo(() => {
   const { getElementProps, focusedComponentId } = useStore();
   if (!focusedComponentId || focusedComponentId === "whiteboard") return <></>;
   const { type, props } = getElementProps(focusedComponentId)!;
@@ -169,5 +169,3 @@ const Resizer = memo(() => {
     </>
   );
 });
-
-export default Resizer;

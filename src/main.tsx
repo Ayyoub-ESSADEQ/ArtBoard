@@ -5,16 +5,18 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Whiteboards } from "./routes/whiteboards.tsx";
 
-import { loader as whiteboardsLoader } from "./App.tsx";
+import { loader as boardLoader } from "./App.tsx";
+import { loader as WhiteboardsLoarder } from "./routes/whiteboards.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/whiteboards",
+    loader: WhiteboardsLoarder,
     element: <Whiteboards />,
   },
   {
     path: "whiteboards/:whiteboardId",
-    loader: whiteboardsLoader,
+    loader: boardLoader,
     element: <App />,
   },
 ]);

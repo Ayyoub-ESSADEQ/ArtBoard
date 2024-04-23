@@ -1,10 +1,10 @@
-import useStore, { Tool } from "../state/store";
-import { HTMLProps, memo } from "react";
-import FileUpload from "./Shapes/FileUpload";
-import * as Icons from "./Icons";
-import * as Stickers from "./stickers/stickers";
+import { FileUpload } from "Components/Shapes";
+import * as Icons from "Icons";
+import * as Stickers from "Components/Stickers";
+import useStore, { Tool } from "Store";
+import { UpdateObserver } from "Utils";
 import axios from "axios";
-import UpdateObserver from "../utils/UpdateObserver";
+import { HTMLProps, memo } from "react";
 
 interface ToolProps extends HTMLProps<HTMLDivElement> {
   functionality: keyof typeof Tool;
@@ -71,7 +71,7 @@ const StickerDrawer = memo(() => {
   );
 });
 
-const ToolBox = memo(() => {
+export const ToolBox = memo(() => {
   const { toolInUseName } = useStore();
 
   return (
@@ -113,5 +113,3 @@ const ToolBox = memo(() => {
     </div>
   );
 });
-
-export default ToolBox;

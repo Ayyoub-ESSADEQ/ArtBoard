@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { SVGProps, memo, useEffect, useRef, useState } from "react";
-import useStore from "../../state/store";
+import useStore from "Store";
 
 interface TextProps extends SVGProps<SVGForeignObjectElement> {
   id: string;
@@ -44,7 +44,7 @@ const setCaret = (contentEditableElement: HTMLDivElement, offset: number) => {
 };
 
 export const Text = memo((props: TextProps) => {
-  const { setElementProps, scale } = useStore();
+  const { setElementProps, setShapeEditor, toolInUseName, scale } = useStore();
 
   const textTag = useRef<HTMLDivElement>(null);
   const caretPos = useRef<number>();
@@ -73,6 +73,19 @@ export const Text = memo((props: TextProps) => {
     }, 0);
   };
 
+ 
+  const showShapeEditor = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (toolInUseName !== "Select") return;
+    const target = e.target as SVGRectElement;
+    const { top, left } = target.getBoundingClientRect();
+    setShapeEditor({
+      show: true,
+      x: left + parseFloat(props.width as string) / (2 * scale),
+      y: top,
+    });
+  };
+
+  //We use this to focus the text box when we created it using the text tool
   useEffect(() => {
     const target = textTag.current;
     if (!target || !props.focus) return;
@@ -107,6 +120,7 @@ export const Text = memo((props: TextProps) => {
         onDoubleClick={handleDoubleClick}
         onInput={handleTextChange}
         onBlur={handleBlur}
+        onClick={showShapeEditor}
         data-placeholder="type text here .."
         className="border-none text-[14px] text-left z-30 px-2 py-1 whitespace-pre-wrap bg-orange-300 outline-none focus:border-none focus:outline-none bg-transparent placeholder caret-black"
       >

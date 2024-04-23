@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import useStore, { CollaboratorCursorPosition } from "../state/store";
+import useStore, { CollaboratorCursorPosition } from "Store";
 
 const PADDING = { x: 8, y: 2 };
 
@@ -83,12 +83,10 @@ const CollaboratorCursor = memo(
   }
 );
 
-const Collaboration = memo(() => {
+export const Collaboration = memo(() => {
   const { collaborators } = useStore();
 
   return collaborators.map((props) => (
     <CollaboratorCursor {...props} key={props.userId} />
   ));
 });
-
-export default Collaboration;

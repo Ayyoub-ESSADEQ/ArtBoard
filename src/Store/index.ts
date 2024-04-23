@@ -1,6 +1,10 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
-import { Context, Shape as ShapeContext } from "../utils/MouseStrategy";
-import { SocketSingleton } from "../utils/socketSingleton";
+import {
+  Context,
+  Shape as ShapeContext,
+  SocketSingleton,
+  UpdateObserver,
+} from "Utils";
 
 export const Tool = {
   Rectangle: "cursor-draw",
@@ -31,7 +35,7 @@ interface OtherShapeProps extends ShapeBase {
   href: string;
 }
 
-interface ConnectorProps  extends ShapeBase{
+interface ConnectorProps extends ShapeBase {
   x1: number;
   y1: number;
   x2: number;
@@ -229,7 +233,11 @@ const useStoreBase = create<BearState>()((set, get) => ({
   addBoardElement(element: Shape, addedByOther) {
     if (!addedByOther) {
       const socketSingleton = SocketSingleton.getInstance();
-      socketSingleton.getSocket()?.emit("add_element", { element: element });
+      const fullProps = {
+        ...element,
+        whiteboard: UpdateObserver.getInstance().getWhiteboardId(),
+      };
+      socketSingleton.getSocket()?.emit("add_element", { element: fullProps });
     }
 
     set(() => ({ board: [...get().board, element] }));

@@ -6,7 +6,7 @@ interface ConnectorProps {
   y2: number;
 }
 
-export default function Connector({ x1, y1, x2, y2, id }: ConnectorProps) {
+export function Connector({ x1, y1, x2, y2, id }: Readonly<ConnectorProps>) {
   return (
     <>
       <defs>

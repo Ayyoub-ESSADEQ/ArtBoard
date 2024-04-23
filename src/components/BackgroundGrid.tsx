@@ -1,7 +1,7 @@
 import { memo } from "react";
-import useStore from "../state/store";
+import useStore from "Store";
 
-const BackgroundGrid = memo(() => {
+export const BackgroundGrid = memo(() => {
   const gridSize = 12;
   const gridDotSize = 2;
   const gridColor = "#e6e6e6";
@@ -37,5 +37,3 @@ const BackgroundGrid = memo(() => {
     </g>
   );
 });
-
-export default BackgroundGrid;

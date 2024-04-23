@@ -1,4 +1,4 @@
-import useStore from "../state/store";
+import useStore from "Store";
 import {
   Whiteboard,
   Shape as ShapeStrategy,
@@ -7,7 +7,7 @@ import {
   DrawCircle,
   Text,
   ArrowHandler,
-} from "../utils/MouseStrategy";
+} from "Utils";
 
 export const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
   const type = (e.target as HTMLElement).dataset.type;

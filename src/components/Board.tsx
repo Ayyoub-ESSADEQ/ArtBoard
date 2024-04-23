@@ -1,18 +1,15 @@
+import { useFullScreen, usePreventBrowserZoom } from "Hooks";
+import { Whiteboard, handleMouseDown } from "Utils";
 import { memo, useEffect, useRef } from "react";
-import { usePreventBrowserZoom } from "../hooks/usePreventBrowserZoom";
-import { handleMouseDown } from "../utils/ManageWhiteboardStrategies";
-import { useFullScreen } from "../hooks/useFullScreen";
-import { Whiteboard } from "../utils/MouseStrategy";
 
-import BackgroundGrid from "./BackgroundGrid";
-import SketchBoard from "./SketchBoard";
-import useStore from "../state/store";
-import useWebsocket from "../hooks/useWebsocket";
+import { BackgroundGrid, SketchBoard } from "Components";
+import { useWebsocket } from "Hooks";
+import useStore from "Store";
 
-const Board = memo(() => {
+export const Board = memo(() => {
   const whiteboardRef = useRef<SVGSVGElement>(null);
   const { viewBox, whiteboardCursor, context } = useStore();
-  
+
   useFullScreen(whiteboardRef);
   usePreventBrowserZoom();
   useWebsocket(whiteboardRef);
@@ -47,5 +44,3 @@ const Board = memo(() => {
     </svg>
   );
 });
-
-export default Board;

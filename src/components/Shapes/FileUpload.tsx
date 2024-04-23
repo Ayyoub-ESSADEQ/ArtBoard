@@ -1,11 +1,10 @@
 import { ChangeEvent, useRef, useState } from "react";
-import { Image } from "../icons/Image";
-import useStore, { Tool } from "../../state/store";
+import { Image, Uploading } from "Icons";
 import { nanoid } from "nanoid";
-import Uploading from "../icons/Uploading";
+import useStore, { Tool } from "Store";
 import axios from "axios";
 
-const FileUpload = () => {
+export const FileUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploaded, setIsUploaded] = useState<boolean>(true);
 
@@ -17,7 +16,7 @@ const FileUpload = () => {
   };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
+    const file = event.target.files?.[0];
 
     if (!file) {
       setIsUploaded(true);
@@ -87,4 +86,3 @@ const FileUpload = () => {
   );
 };
 
-export default FileUpload;
