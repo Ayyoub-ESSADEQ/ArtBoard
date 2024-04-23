@@ -1,6 +1,6 @@
-import { Whiteboard } from "./MouseStrategy";
+import { Whiteboard } from "Utils";
 
-export default function mouseToSvgCoords(e: React.MouseEvent<unknown>) {
+export function mouseToSvgCoords(e: React.MouseEvent<unknown>) {
   const svg = Whiteboard.whiteboardReference;
   const point = new DOMPoint();
 

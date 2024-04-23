@@ -1,4 +1,4 @@
-import { Folder, RightPanelCollapse, Star } from "./Icons";
+import { Folder, RightPanelCollapse, Star } from "Icons";
 
 const Title = ({ title, icon }: { title: string; icon: React.ReactNode }) => {
   return (

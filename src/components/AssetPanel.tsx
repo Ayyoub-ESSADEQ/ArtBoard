@@ -1,5 +1,5 @@
 import { KeyboardEvent, memo, useRef, useState } from "react";
-import { Search } from "./Icons";
+import { Search } from "Icons";
 import axios from "axios";
 
 interface AssetPanelProps extends React.HTMLProps<HTMLDivElement> {}
@@ -11,7 +11,7 @@ const getIconLink = (s: string) => {
   return s + ".svg";
 };
 
-const AssetsPanel = memo((props: AssetPanelProps) => {
+export const AssetPanel = memo((props: AssetPanelProps) => {
   const searchBox = useRef<HTMLInputElement>(null);
   const handleSearch = async (e: KeyboardEvent<HTMLInputElement>) => {
     if (!searchBox.current || e.key !== "Enter") return;
@@ -46,11 +46,10 @@ const AssetsPanel = memo((props: AssetPanelProps) => {
             className="size-6 p-1 box-content hover:bg-gray-200 rounded-md"
             key={v}
             src={`${ASSETS_BASE_URL}/${getIconLink(v)}`}
+            alt="icon"
           ></img>
         ))}
       </div>
     </div>
   );
 });
-
-export default AssetsPanel;

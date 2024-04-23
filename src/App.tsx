@@ -1,19 +1,23 @@
-import Header from "./components/Header";
-import Whiteboard from "./components/Board";
-import ToolBox from "./components/ToolBox";
-import { CommentSection } from "./components/CommentSection";
-import Overlay from "./components/Overlay";
-import ZoomIndicator from "./components/ZoomIndicator";
-import { useLoaderData } from "react-router-dom";
-import { useEffect } from "react";
-import useStore, { Shape } from "./state/store";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  CommentSection,
+  Header,
+  Overlay,
+  ToolBox,
+  Board as Whiteboard,
+  ZoomIndicator,
+} from "Components";
+import useStore, { Shape } from "Store";
+import { UpdateObserver } from "Utils";
 import axios from "axios";
-import UpdateObserver from "./utils/UpdateObserver";
+import { useEffect, useState } from "react";
+import { useLoaderData } from "react-router-dom";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface Data {
-  whiteboards: { content: Shape[] };
+  whiteboard: { content: Shape[] };
 }
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, react-refresh/only-export-components
 export async function loader({ params }: any): Promise<Data> {
   try {
@@ -21,30 +25,31 @@ export async function loader({ params }: any): Promise<Data> {
     const response = await axios.get(url);
     const observer = UpdateObserver.getInstance();
     observer.setUrl(url);
-    return { whiteboards: response.data };
+    observer.setWhiteboardId(params.whiteboardId);
+    return { whiteboard: response.data };
   } catch (e) {
-    return { whiteboards: { content: [] } };
+    return { whiteboard: { content: [] } };
   }
 }
 
-function App() {
+export default function App() {
   const setBoard = useStore((state) => state.setBoard);
-  const { whiteboards } = useLoaderData() as Data;
+  const [title, setTitle] = useState("loading..");
+  const { whiteboard } = useLoaderData() as Data;
 
   useEffect(() => {
-    setBoard(whiteboards.content);
+    setBoard(whiteboard.content);
+    setTitle((whiteboard.content[0] as any).whiteboard.name);
   }, []);
 
   return (
     <div className="flex flex-row w-full h-full relative select-none">
       <Overlay></Overlay>
       <Whiteboard></Whiteboard>
-      <Header></Header>
+      <Header title={title}></Header>
       <CommentSection />
       <ToolBox />
       <ZoomIndicator />
     </div>
   );
 }
-
-export default App;

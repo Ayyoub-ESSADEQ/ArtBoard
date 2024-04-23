@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Planner() {
+export function Planner() {
   const [notes, setNotes] = useState([["hello world"]]);
   const addNewNote = (index: number) => {
     const newNotes = [...notes];
@@ -73,5 +73,3 @@ function Planner() {
     </foreignObject>
   );
 }
-
-export default Planner;

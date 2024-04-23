@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MouseEvent, WheelEvent } from "react";
-import useStore, { Shape as ShapeProps } from "../state/store";
+import useStore, { Shape as ShapeProps } from "Store";
 import { nanoid } from "nanoid";
 
 interface Position {

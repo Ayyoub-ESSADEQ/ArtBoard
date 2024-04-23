@@ -1,6 +1,6 @@
 import { HTMLProps, memo } from "react";
-import useStore from "../state/store";
-import * as Icons from "./Icons";
+import useStore from "Store";
+import * as Icons from "Icons";
 
 const Editor = memo((props: HTMLProps<HTMLDivElement>) => {
   return (
@@ -24,7 +24,7 @@ const Editor = memo((props: HTMLProps<HTMLDivElement>) => {
   );
 });
 
-const Overlay = memo(() => {
+export const Overlay = memo(() => {
   const { shapeEditor } = useStore();
 
   const position = shapeEditor.show
@@ -40,5 +40,3 @@ const Overlay = memo(() => {
     </div>
   );
 });
-
-export default Overlay;

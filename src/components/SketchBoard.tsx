@@ -1,15 +1,10 @@
+import { Circle, Connector, Rectangle, Shape, Text } from "Components/Shapes";
 import { memo } from "react";
-import { Rectangle } from "./Shapes/Rectangle";
-import { Shape } from "./Shapes/Shape";
-import { Text } from "./Shapes/Text";
-import { Circle } from "./Shapes/Circle";
 
-import useStore from "../state/store";
-import Collaboration from "./Collaboration";
-import Resizer from "./Resizer";
-import Connector from "./Shapes/Connector";
+import { Collaboration, Resizer } from "Components";
+import useStore from "Store";
 
-const SketchBoard = memo(() => {
+export const SketchBoard = memo(() => {
   const { board } = useStore();
 
   return (
@@ -38,12 +33,9 @@ const SketchBoard = memo(() => {
         })}
       </g>
       <g>
-        <Connector id="something" x1={300} y1={30} x2={200} y2={0} />
         <Resizer />
       </g>
       <Collaboration />
     </>
   );
 });
-
-export default SketchBoard;

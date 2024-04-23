@@ -1,6 +1,6 @@
+import * as Icons from "Icons";
+import useStore from "Store";
 import { memo } from "react";
-import useStore from "../state/store";
-import * as Icons from "./Icons";
 
 export const CommentSection = memo(() => {
   const { isCommentSectionToggeled, setCommentSectionToToggled } = useStore();

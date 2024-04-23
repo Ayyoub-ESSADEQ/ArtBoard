@@ -1,18 +1,17 @@
 import { memo } from "react";
-import useStore from "../state/store";
-import { Whiteboard } from "../utils/MouseStrategy";
-import { Minus } from "./icons/Minus";
-import { Plus } from "./icons/Plus";
+import { Whiteboard } from "Utils";
+import { Minus, Plus } from "Icons";
+import useStore from "Store";
 
 const SCALING_FACTOR = 1.1;
 
-const ZoomIndicator = memo(() => {
+export const ZoomIndicator = memo(() => {
   const { scale, viewBox, isCommentSectionToggeled, setScale, setViewBox } =
     useStore();
   const right_offset = isCommentSectionToggeled
     ? "right-[308px]"
     : "right-[8px]";
-    
+
   const className =
     "w-9 h-9 flex items-center hover:bg-[#788896] hover:cursor-pointer hover:border-0 hover:text-white justify-center border-x-[#fafbfc] border";
   const toPercentage = (n: number) => Math.round(n * 100) + "%";
@@ -52,5 +51,3 @@ const ZoomIndicator = memo(() => {
     </div>
   );
 });
-
-export default ZoomIndicator;
