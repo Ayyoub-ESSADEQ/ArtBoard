@@ -1,37 +1,17 @@
 {
-  "name": "whiteboard",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "artboard",
+  "version": "1.0.0",
+  "description": "a react based whiteboard 🎨, brainstorming 🧠 and collaboration 🦾 tool that comes handy in design thinking sessions.",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "setup-project": "cd api && npm install && cd ../client && npm install"
   },
-  "dependencies": {
-    "@types/node": "^20.12.7",
-    "axios": "^1.6.8",
-    "nanoid": "^5.0.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.3",
-    "socket.io-client": "^4.7.4",
-    "zustand": "^4.5.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.56",
-    "@types/react-dom": "^18.2.19",
-    "@typescript-eslint/eslint-plugin": "^7.0.2",
-    "@typescript-eslint/parser": "^7.0.2",
-    "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.17",
-    "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "postcss": "^8.4.35",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.1.4"
-  }
+  "keywords": [
+    "canvas",
+    "react",
+    "brainstorming",
+    "drawing",
+    "collaboration"
+  ],
+  "author": "Ayyoub Essadeq",
+  "license": "MIT"
 }
