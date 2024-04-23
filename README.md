@@ -24,6 +24,7 @@ A React based whiteboard 🎨, brainstorming 🧠 and collaboration 🦾 tool th
 - `git clone https://github.com/Ayyoub-ESSADEQ/ArtBoard.git`
 - Create an empty `.env` file in `/api`, copy `/api/.env.example` contents into it, and fill with corresponding data.
 - `npm run setup-project`
+- Create a folder called `uploads` under `./api`.
 - `cd api && npm run serve`
 - `cd client && npm run dev` in another terminal tab
 - App should now be running on `http://localhost:5173/whiteboards`
