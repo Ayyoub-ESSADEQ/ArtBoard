@@ -29,6 +29,9 @@ A React based whiteboard 🎨, brainstorming 🧠 and collaboration 🦾 tool th
 - `cd client && npm run dev` in another terminal tab
 - App should now be running on `http://localhost:5173/whiteboards`
 
+# Demo:
+demonstration video can be found here : https://youtu.be/FdT8I-KMFbo
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)
